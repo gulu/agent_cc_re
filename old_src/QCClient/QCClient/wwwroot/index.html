@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>报告质控助手</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+
+<div id="app">
+  <!-- 顶栏 -->
+  <header class="header">
+    <span class="header-title">报告质控助手</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="status-dot" id="statusDot">●</span>
+      <button class="collapse-btn" id="collapseBtn" title="收起面板 (Ctrl+Q)">▼</button>
+    </div>
+  </header>
+
+  <!-- 手动输入区 -->
+  <section class="input-section collapsible" id="inputSection">
+    <div class="input-row">
+      <input type="text" id="accessNumber" placeholder="请输入影像号（支持扫描枪）" maxlength="32">
+      <button id="btnQc" onclick="triggerQc()">质控</button>
+    </div>
+    <div class="input-row manual-row">
+      <textarea id="manualFindings" placeholder="报告所见（可选，为空时自动查询）" rows="2"></textarea>
+      <textarea id="manualImpression" placeholder="报告诊断（可选，为空时自动查询）" rows="2"></textarea>
+      <button id="btnManual" onclick="manualQc()">手动质控</button>
+    </div>
+  </section>
+
+  <!-- 进度状态 -->
+  <div class="progress" id="progress">
+    <span class="progress-text" id="progressText">● 等待中</span>
+  </div>
+
+  <!-- 内容区 -->
+  <div class="content" id="content">
+
+    <!-- 患者信息 -->
+    <div class="patient-info" id="patientInfo" style="display:none">
+      <div class="section-title">📋 患者信息</div>
+      <div class="info-grid" id="infoGrid"></div>
+    </div>
+
+    <!-- 评分 -->
+    <div class="score-section" id="scoreSection" style="display:none">
+      <div class="score-circle" id="scoreCircle">
+        <span class="score-value" id="scoreValue">--</span>
+        <span class="score-label">分</span>
+      </div>
+      <div class="score-status" id="scoreStatus"></div>
+    </div>
+
+    <!-- 维度评分 -->
+    <div class="dimensions" id="dimensions" style="display:none">
+      <div class="section-title">📊 维度评分</div>
+      <div class="dimension-grid" id="dimensionGrid"></div>
+    </div>
+
+    <!-- 问题列表 -->
+    <div class="issues" id="issues" style="display:none">
+      <div class="section-title">📋 质控问题</div>
+      <div id="issueList"></div>
+    </div>
+
+    <!-- 摘要 -->
+    <div class="summary" id="summary" style="display:none">
+      <div class="section-title">💡 修正建议</div>
+      <p id="summaryText"></p>
+    </div>
+
+    <!-- 空状态 -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔬</div>
+      <p>等待质控结果...<br>系统将在检测到影像号后自动分析</p>
+    </div>
+
+    <!-- 加载中 -->
+    <div class="loading" id="loading" style="display:none">
+      <div class="spinner"></div>
+      <span id="loadingText">分析中...</span>
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <footer class="footer">
+    <button class="footer-btn" onclick="copySuggestions()" id="btnCopy">📋 复制建议</button>
+    <button class="footer-btn" onclick="reQc()">🔄 重新质控</button>
+  </footer>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- DEBUG 面板 -->
+<div class="debug-panel" id="debugPanel" style="display:block;margin:4px;padding:6px;background:#1e1e1e;color:#0f0;font:10px monospace;max-height:120px;overflow-y:auto;border-radius:4px;border:1px solid #333;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+    <span style="color:#ff0;">🐛 Debug Log</span>
+    <button onclick="toggleDebug()" style="background:none;border:0.5px solid #555;color:#999;font:9px monospace;cursor:pointer;padding:1px 4px;border-radius:2px;">关闭</button>
+  </div>
+  <div id="debugLog">等待事件...</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

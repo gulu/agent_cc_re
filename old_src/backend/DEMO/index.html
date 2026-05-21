@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>九枢医学影像质控系统 - 报告质控演示</title>
+<style>
+  :root {
+    --bg: #1a1d23;
+    --panel: #22262e;
+    --border: #2d323c;
+    --text: #e0e2e8;
+    --text-dim: #8b8fa3;
+    --accent: #4a9eff;
+    --pass: #2ecc71;
+    --fail: #e74c3c;
+    --warn: #f39c12;
+    --critical: #e74c3c;
+    --error: #e67e22;
+    --input-bg: #2a2e36;
+    --radius: 8px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Microsoft YaHei', 'PingFang SC', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+  
+  .app { max-width: 1400px; margin: 0 auto; }
+  .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: var(--panel); border-radius: var(--radius); margin-bottom: 20px; border: 1px solid var(--border); }
+  .header h1 { font-size: 20px; font-weight: 600; }
+  .header h1 span { color: var(--accent); }
+  .header .subtitle { color: var(--text-dim); font-size: 13px; }
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .status-dot.online { background: var(--pass); box-shadow: 0 0 6px var(--pass); }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .panel-title { font-size: 13px; font-weight: 600; color: var(--accent); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .field-row { display: flex; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+  .field { flex: 1; min-width: 120px; }
+  .field label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 3px; }
+  .field input, .field select { width: 100%; padding: 6px 10px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: 13px; outline: none; }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+
+  .report-area { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .report-area .panel { margin-bottom: 0; }
+  .report-area textarea { width: 100%; min-height: 200px; padding: 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: 14px; line-height: 1.8; resize: vertical; outline: none; font-family: inherit; }
+  .report-area textarea:focus { border-color: var(--accent); }
+  .report-area .char-count { text-align: right; font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+  .actions { display: flex; gap: 12px; margin-bottom: 20px; }
+  .btn { padding: 10px 28px; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #3a8ef0; transform: translateY(-1px); }
+  .btn-secondary { background: var(--input-bg); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: #353a45; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .results { display: none; }
+  .results.show { display: block; }
+  .score-bar { display: flex; align-items: center; gap: 24px; padding: 20px; background: var(--input-bg); border-radius: var(--radius); margin-bottom: 16px; }
+  .score-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; flex-shrink: 0; border: 4px solid; }
+  .score-circle.pass { border-color: var(--pass); color: var(--pass); }
+  .score-circle.fail { border-color: var(--fail); color: var(--fail); }
+  .score-meta { flex: 1; }
+  .score-meta .status-label { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  .score-meta .status-label.pass { color: var(--pass); }
+  .score-meta .status-label.fail { color: var(--fail); }
+  .score-meta .qc-level { font-size: 13px; color: var(--text-dim); margin-bottom: 4px; }
+  .score-meta .summary { font-size: 13px; color: var(--text-dim); }
+  .score-meta .time { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+  .dimensions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .dim-item { background: var(--input-bg); padding: 12px; border-radius: 6px; text-align: center; }
+  .dim-item .name { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+  .dim-item .score { font-size: 22px; font-weight: 600; }
+  .dim-item .score.pass { color: var(--pass); }
+  .dim-item .score.fail { color: var(--fail); }
+  .dim-item .weight { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  .issues-list { margin-bottom: 16px; }
+  .issue-item { display: flex; gap: 12px; padding: 10px 14px; background: var(--input-bg); border-radius: 6px; margin-bottom: 6px; border-left: 4px solid; align-items: flex-start; }
+  .issue-item.severity-critical { border-left-color: var(--critical); }
+  .issue-item.severity-error { border-left-color: var(--error); }
+  .issue-item.severity-warning { border-left-color: var(--warn); }
+  .issue-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  .issue-badge.critical { background: #e74c3c22; color: var(--critical); }
+  .issue-badge.error { background: #e67e2222; color: var(--error); }
+  .issue-badge.warning { background: #f39c1222; color: var(--warn); }
+  .issue-text { flex: 1; font-size: 13px; line-height: 1.5; }
+  .issue-text .orig { color: var(--fail); }
+  .issue-text .suggest { color: var(--pass); }
+  .issue-suggestion { font-size: 12px; color: var(--accent); margin-top: 2px; }
+
+  .loading { display: none; align-items: center; gap: 10px; padding: 12px; color: var(--text-dim); }
+  .loading.show { display: flex; }
+  .spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast { position: fixed; bottom: 30px; right: 30px; padding: 14px 24px; border-radius: 8px; color: #fff; font-size: 14px; z-index: 1000; opacity: 0; transform: translateY(20px); transition: all 0.3s; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { background: #27ae60; }
+  .toast.error { background: #e74c3c; }
+
+  @media (max-width: 900px) {
+    .grid, .grid-3, .report-area { grid-template-columns: 1fr; }
+    .dimensions { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>🫁 <span>九枢</span> 医学影像质控系统</h1>
+      <div class="subtitle">报告质控演示 · ReportQC Demo</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span style="font-size:12px;color:var(--text-dim)"><span class="status-dot online"></span>API 已连接</span>
+      <span style="font-size:12px;color:var(--text-dim)" id="apiStatus">http://localhost:5100</span>
+    </div>
+  </div>
+
+  <div class="grid grid-3">
+    <div class="panel">
+      <div class="panel-title">👤 患者信息</div>
+      <div class="field-row">
+        <div class="field"><label>姓名</label><input id="patientName" value="张三"></div>
+        <div class="field"><label>性别</label><select id="patientGender"><option value="男" selected>男</option><option value="女">女</option></select></div>
+        <div class="field"><label>年龄</label><input id="patientAge" value="55" type="number"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>身份证号</label><input id="patientIdNo" value="****1234"></div>
+        <div class="field"><label>门诊号</label><input id="outpatientNo" value="OP-20260507"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">🏥 临床信息</div>
+      <div class="field-row">
+        <div class="field"><label>临床诊断</label><input id="clinicalDiagnosis" value="咳嗽待查"></div>
+        <div class="field"><label>症状</label><input id="symptoms" value="咳嗽、咳痰2周"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>病史</label><input id="medicalHistory" value="高血压史10年"></div>
+        <div class="field"><label>申请科室</label><input id="requestDepartment" value="呼吸内科"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">🔬 检查信息</div>
+      <div class="field-row">
+        <div class="field"><label>检查部位</label><input id="examPart" value="胸部"></div>
+        <div class="field"><label>设备</label><select id="examDevice"><option value="CT" selected>CT</option><option value="MRI">MRI</option><option value="DR">DR</option><option value="超声">超声</option><option value="胃镜">胃镜</option></select></div>
+        <div class="field"><label>方法</label><input id="examMethod" value="平扫+增强"></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>检查日期</label><input id="examDate" type="date"></div>
+        <div class="field"><label>报告日期</label><input id="reportDate" type="date"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-area">
+    <div class="panel">
+      <div class="panel-title">📋 影像所见 <span style="font-weight:400;color:var(--text-dim);font-size:11px;text-transform:none">(Findings)</span></div>
+      <textarea id="findings" placeholder="输入影像所见描述...">双肺纹理清晰，未见明确肿块影。心脏大小正常。</textarea>
+      <div class="char-count"><span id="findingsCount">0</span> 字符</div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">📄 诊断结论 <span style="font-weight:400;color:var(--text-dim);font-size:11px;text-transform:none">(Impression)</span></div>
+      <textarea id="impression" placeholder="输入诊断结论...">右肺上叶可见结节影，建议随访。</textarea>
+      <div class="char-count"><span id="impressionCount">0</span> 字符</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="generateRandom()">🎲 随机生成报告</button>
+    <button class="btn btn-primary" onclick="runQC()" id="runBtn">🚀 执行质控</button>
+    <div class="loading" id="loading"><div class="spinner"></div> 质控分析中...</div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="panel-title">📊 质控结果</div>
+    <div class="score-bar" id="scoreBar"></div>
+    <div class="dimensions" id="dimensions"></div>
+    <div class="issues-list" id="issuesList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── 随机报告模板 ──────────────────────────
+const templates = [
+  {
+    label: '阴阳性矛盾',
+    findings: '双肺纹理清晰，未见明确肿块影。心脏大小正常。膈面光滑，肋膈角锐利。',
+    impression: '右肺上叶可见结节影，大小约1.5cm，边界欠清。建议进一步检查。',
+    gender: '男', age: 55, part: '胸部', device: 'CT',
+    diagnosis: '体检异常', symptoms: '无'
+  },
+  {
+    label: '性别矛盾',
+    findings: '子宫大小形态正常，双侧附件区未见明显异常。盆腔未见积液。',
+    impression: '子宫、附件未见明显异常。建议定期复查。',
+    gender: '男', age: 45, part: '盆腔', device: 'CT',
+    diagnosis: '腹痛待查', symptoms: '下腹痛3天'
+  },
+  {
+    label: '错别字+缺标点',
+    findings: '肝右叶可见类圆形低密谋灶，边介清楚，大小约3cm×2cm。肝内胆管无扩章',
+    impression: '肝右叶低密度灶，考虑肝囊肿可能，建议随访',
+    gender: '女', age: 48, part: '腹部', device: 'CT',
+    diagnosis: '肝占位待查', symptoms: '右上腹不适'
+  },
+  {
+    label: '方位矛盾',
+    findings: '左侧乳腺外上象限可见结节影，大小约1.2cm，边界清晰，未见毛刺征。',
+    impression: '右侧乳腺 BI-RADS 3类，建议短期随访（6个月）。',
+    gender: '女', age: 42, part: '乳腺', device: '超声',
+    diagnosis: '乳腺结节', symptoms: '触及肿块'
+  },
+  {
+    label: '年龄矛盾+缺尺寸',
+    findings: '颅脑MRI显示双侧基底节区可见多发腔隙性脑梗灶，脑白质稀疏。',
+    impression: '腔隙性脑梗死。脑白质变性。建议控制血压血脂。',
+    gender: '男', age: 8, part: '头颅', device: 'MRI',
+    diagnosis: '头痛待查', symptoms: '反复头痛1月'
+  },
+  {
+    label: '口语化+诊断跳跃',
+    findings: '双肺看起来还好，纹理比较清晰，心脏大小看起来正常。',
+    impression: '右肺上叶占位性病变，考虑肿瘤性病变，建议穿刺活检。',
+    gender: '男', age: 62, part: '胸部', device: 'CT',
+    diagnosis: '咳嗽待查', symptoms: '咳嗽、咳痰'
+  },
+  {
+    label: '设备冲突',
+    findings: 'MRI示：左膝关节内侧半月板后角见线状高信号，达关节面。',
+    impression: 'CT示左膝内侧半月板损伤（III级），建议关节镜治疗。',
+    gender: '女', age: 35, part: '左膝关节', device: 'MRI',
+    diagnosis: '膝关节外伤', symptoms: '左膝疼痛1月'
+  },
+  {
+    label: '平扫/增强矛盾',
+    findings: '肝脏大小形态正常，肝实质内未见明确占位性病变。增强扫描后病灶可见明显强化。',
+    impression: '肝右叶可见强化结节，考虑血管瘤可能。',
+    gender: '男', age: 50, part: '腹部', device: 'CT',
+    diagnosis: '体检发现肝占位', symptoms: '无'
+  },
+  {
+    label: '危急征象+多问题',
+    findings: '左侧胸腔可见大量气胸，肺组织压缩约70%。纵隔向右侧移位。',
+    impression: '左侧自发性气胸（大量）。建议立即胸腔闭式引流。',
+    gender: '男', age: 28, part: '胸部', device: 'CT',
+    diagnosis: '突发胸痛', symptoms: '突发胸痛2小时'
+  },
+  {
+    label: '正常报告（满分）',
+    findings: '双肺纹理清晰，未见明确实质性浸润影。气管居中，纵隔无移位。心脏大小形态正常，膈面光滑，肋膈角锐利。',
+    impression: '胸部CT平扫未见明显异常。',
+    gender: '女', age: 35, part: '胸部', device: 'CT',
+    diagnosis: '健康体检', symptoms: '无'
+  },
+  {
+    label: '程度矛盾',
+    findings: '腰椎退行性变，L4/5椎间盘轻度膨出，硬膜囊轻度受压。',
+    impression: 'L4/5椎间盘重度突出，椎管明显狭窄，建议手术治疗。',
+    gender: '男', age: 55, part: '腰椎', device: 'MRI',
+    diagnosis: '腰痛', symptoms: '腰痛伴下肢麻木'
+  },
+  {
+    label: 'RADS分类缺失',
+    findings: '乳腺外上象限可见不规则肿块影，大小约2.5cm，边界不清，可见毛刺征。',
+    impression: '左乳肿块，建议穿刺活检。',
+    gender: '女', age: 52, part: '乳腺', device: '超声',
+    diagnosis: '乳腺肿块', symptoms: '触及质硬肿块'
+  }
+];
+
+// ── 初始化 ────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('examDate').value = today;
+  document.getElementById('reportDate').value = today;
+  updateCharCount();
+  document.querySelectorAll('#findings, #impression').forEach(el => {
+    el.addEventListener('input', updateCharCount);
+  });
+});
+
+function updateCharCount() {
+  document.getElementById('findingsCount').textContent = document.getElementById('findings').value.length;
+  document.getElementById('impressionCount').textContent = document.getElementById('impression').value.length;
+}
+
+// ── 随机生成报告 ──────────────────────────
+function generateRandom() {
+  const tpl = templates[Math.floor(Math.random() * templates.length)];
+  document.getElementById('findings').value = tpl.findings;
+  document.getElementById('impression').value = tpl.impression;
+  document.getElementById('patientGender').value = tpl.gender;
+  document.getElementById('patientAge').value = tpl.age;
+  document.getElementById('examPart').value = tpl.part;
+  document.getElementById('examDevice').value = tpl.device;
+  document.getElementById('clinicalDiagnosis').value = tpl.diagnosis;
+  document.getElementById('symptoms').value = tpl.symptoms;
+
+  // 随机姓名
+  const surnames = ['张','王','李','赵','刘','陈','杨','黄','周','吴','徐','孙','胡','朱','高','林','何','郭','马','罗'];
+  const given = ['伟','芳','娜','强','磊','敏','静','丽','洋','勇','军','杰','娟','艳','涛','明','超','秀英','桂英','华'];
+  document.getElementById('patientName').value = surnames[Math.floor(Math.random()*surnames.length)] + given[Math.floor(Math.random()*given.length)];
+
+  updateCharCount();
+  document.getElementById('results').classList.remove('show');
+  showToast(`已生成报告：${tpl.label}`, 'success');
+}
+
+// ── 执行质控 ──────────────────────────────
+async function runQC() {
+  const findings = document.getElementById('findings').value.trim();
+  const impression = document.getElementById('impression').value.trim();
+  if (!findings && !impression) {
+    showToast('请先输入报告内容', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('runBtn');
+  const loading = document.getElementById('loading');
+  btn.disabled = true;
+  loading.classList.add('show');
+
+  const payload = {
+    reportId: 'DEMO-' + Date.now().toString(36).toUpperCase(),
+    findings,
+    impression,
+    reportType: document.getElementById('examDevice').value,
+    patientName: document.getElementById('patientName').value,
+    patientGender: document.getElementById('patientGender').value,
+    patientAge: parseInt(document.getElementById('patientAge').value) || 0,
+    patientIdNo: document.getElementById('patientIdNo').value,
+    outpatientNo: document.getElementById('outpatientNo').value,
+    clinicalDiagnosis: document.getElementById('clinicalDiagnosis').value,
+    symptoms: document.getElementById('symptoms').value,
+    medicalHistory: document.getElementById('medicalHistory').value,
+    requestDepartment: document.getElementById('requestDepartment').value,
+    examPart: document.getElementById('examPart').value,
+    examDevice: document.getElementById('examDevice').value,
+    examMethod: document.getElementById('examMethod').value,
+    examDate: document.getElementById('examDate').value,
+    reportDate: document.getElementById('reportDate').value,
+  };
+
+  try {
+    const start = Date.now();
+    const res = await fetch('/api/v1/qc/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch (e) { throw new Error('返回数据非JSON格式: ' + text.slice(0,100)); }
+    if (data.Code !== 200) throw new Error(data.Msg || '质控失败');
+    const elapsed = Date.now() - start;
+    renderResults(data.Data, elapsed);
+    showToast(`质控完成 (${data.Data.ProcessTimeMs}ms)`, 'success');
+  } catch (err) {
+    console.error('QC Error:', err);
+    showToast(`质控失败: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    loading.classList.remove('show');
+  }
+}
+
+// ── 渲染结果 ──────────────────────────────
+function renderResults(d, elapsed) {
+  const results = document.getElementById('results');
+  results.classList.add('show');
+
+  // Score bar
+  const scoreBar = document.getElementById('scoreBar');
+  const scoreClass = d.Passed ? 'pass' : 'fail';
+  scoreBar.innerHTML = `
+    <div class="score-circle ${scoreClass}">${d.TotalScore}</div>
+    <div class="score-meta">
+      <div class="status-label ${scoreClass}">${d.Passed ? '✅ 通过' : '❌ 未通过'}</div>
+      <div class="qc-level">${d.QcLevel} · 及格线 ${d.PassScore} 分</div>
+      <div class="summary">${d.Summary}</div>
+      <div class="time">⏱ ${d.ProcessTimeMs}ms · 网络延迟 ${elapsed}ms</div>
+    </div>
+  `;
+
+  // Dimensions
+  const dims = document.getElementById('dimensions');
+  dims.innerHTML = d.CheckItems.map(c => `
+    <div class="dim-item">
+      <div class="name">${c.DimensionName}</div>
+      <div class="score ${c.Passed ? 'pass' : 'fail'}">${c.Score}</div>
+      <div class="weight">权重 ${c.Weight}%</div>
+    </div>
+  `).join('');
+
+  // Issues
+  const issues = document.getElementById('issuesList');
+  if (!d.Issues || d.Issues.length === 0) {
+    issues.innerHTML = '<div style="padding:20px;text-align:center;color:var(--pass);font-size:16px">✅ 未发现问题</div>';
+    return;
+  }
+  issues.innerHTML = '<div style="font-size:13px;color:var(--text-dim);margin-bottom:8px">共 ' + d.Issues.length + ' 项质控提示</div>' +
+    d.Issues.map(i => {
+      const sev = i.Severity === 'critical' ? 'critical' : i.Severity === 'error' ? 'error' : 'warning';
+      const sevLabel = i.Severity === 'critical' ? '严重' : i.Severity === 'error' ? '错误' : '警告';
+      const levelLabel = 'L' + (i.Location === 'impression' ? '结论' : i.Location === 'findings' ? '所见' : '全文');
+      return `
+        <div class="issue-item severity-${sev}">
+          <div>
+            <span class="issue-badge ${sev}">${sevLabel}</span>
+            <span style="font-size:11px;color:var(--text-dim)">${levelLabel}</span>
+          </div>
+          <div class="issue-text">
+            <div>${i.Description || ''}</div>
+            ${i.OriginalText ? '<div class="orig">原文: ' + i.OriginalText + '</div>' : ''}
+            ${i.SuggestedText ? '<div class="suggest">建议: ' + i.SuggestedText + '</div>' : ''}
+            ${i.Suggestion ? '<div class="issue-suggestion">💡 ' + i.Suggestion + '</div>' : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+}
+
+// ── Toast ─────────────────────────────────
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

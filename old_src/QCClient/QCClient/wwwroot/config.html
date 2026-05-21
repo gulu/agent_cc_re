@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OCR 区域配置</title>
+<style>
+:root{--p:#1e60be;--s:#22c55e;--d:#ef4444;--w:#f59e0b;--bg:#f8fafc;--card:#fff;--t:#1e293b;--t2:#64748b;--b:#e2e8f0;--r:6px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font:13px/1.5 -apple-system,"Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t);padding:8px;overflow-x:hidden}
+h1{font-size:14px;color:var(--p);display:flex;align-items:center;gap:6px;margin:0}
+.sub{font-size:11px;color:var(--t2);margin:4px 0 0}
+.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.top-left{flex:1;min-width:180px}
+.top-right{display:flex;gap:6px;flex-wrap:wrap}
+.btn{padding:5px 10px;border:0.5px solid var(--b);border-radius:var(--r);cursor:pointer;font-size:12px;background:var(--card);white-space:nowrap}
+.btn:hover{border-color:var(--p)}
+.btn-p{background:var(--p);color:#fff;border-color:var(--p)}
+.btn-s{background:var(--s);color:#fff;border-color:var(--s)}
+.btn-w{background:var(--w);color:#fff;border-color:var(--w)}
+.btn-d{color:var(--d);border-color:var(--d)}
+.tips{font-size:11px;color:var(--t2);background:#eff6ff;border:0.5px solid #bfdbfe;border-radius:var(--r);padding:6px 8px;margin-bottom:8px;line-height:1.5}
+.tips b{color:var(--p)}
+.intv{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);margin-bottom:8px}
+.intv input{width:55px;padding:3px 5px;border:0.5px solid var(--b);border-radius:4px;font-size:12px}
+.area{margin-bottom:6px;background:var(--card);border:0.5px solid var(--b);border-radius:var(--r);padding:8px}
+.area-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:4px}
+.area-name{font-weight:500;font-size:12px}
+.badge{padding:1px 6px;border-radius:3px;font-size:10px;font-weight:500}
+.bd-a{background:#e0e7ff;color:var(--p)}
+.bd-c{background:#fef3c7;color:#92400e}
+.bd-d{background:#d1fae5;color:#065f46}
+.area-cd{font-size:10px;color:var(--t2);display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.area-cd span{background:#f1f5f9;padding:1px 5px;border-radius:3px}
+.area-ctr{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.area-ctr label{font-size:10px;color:var(--t2)}
+.area-ctr input,.area-ctr select{padding:2px 4px;border:0.5px solid var(--b);border-radius:3px;font-size:10px;width:42px}
+.area-ctr select{width:80px}
+.area-ctr .nm{width:56px}
+.tgl{width:34px;height:18px;border-radius:9px;border:none;cursor:pointer;position:relative;transition:.2s;flex-shrink:0}
+.tgl.on{background:var(--s)}.tgl.off{background:var(--b)}
+.tgl::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+.tgl.on::after{left:18px}
+.pv{display:none;margin-top:6px;padding:6px;background:#f8fafc;border-radius:4px;border:0.5px solid var(--b)}
+.pv.on{display:block}
+.pv-r{display:flex;gap:8px;align-items:flex-start}
+.pv-img{border:0.5px solid var(--b);border-radius:3px;background:#fff;flex-shrink:0}
+.pv-img img{display:block;max-width:180px;max-height:80px;image-rendering:pixelated}
+.pv-info{flex:1;min-width:0}
+.pv-txt{font-size:11px;background:#fff;border:0.5px solid var(--b);border-radius:3px;padding:4px 6px;margin-bottom:4px;white-space:pre-wrap;word-break:break-all;max-height:50px;overflow-y:auto;color:var(--t)}
+.pv-meta{font-size:10px;color:var(--t2)}
+.pv-meta .ok{font-weight:500;color:var(--s)}
+.pv-meta .bad{color:var(--d)}
+.empty{text-align:center;padding:24px;color:var(--t2);font-size:12px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:8px 16px;border-radius:var(--r);font-size:12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-left">
+    <h1>📐 OCR 区域配置</h1>
+    <p class="sub">设置屏幕识别区域，点击「测试截取」预览效果</p>
+  </div>
+  <div class="top-right">
+    <a href="/index.html" style="font-size:11px;color:var(--t2);text-decoration:none;padding:4px 8px;border:0.5px solid var(--b);border-radius:var(--r);">← 返回</a>
+    <button class="btn btn-w" onclick="screenPick()">🎯 屏幕框选</button>
+    <button class="btn btn-p" onclick="addArea()">＋ 添加</button>
+    <button class="btn btn-s" onclick="saveAreas()">💾 保存</button>
+  </div>
+</div>
+
+<div class="tips"><b>使用提示：</b>点击「🎯 屏幕框选」可在屏幕上拖拽框选区域；或手动设置 X/Y/W/H 后点击「📸 测试截取」查看截图和识别结果。</div>
+
+<label class="intv">默认轮询间隔：<input type="number" id="defaultInterval" min="1" max="60"> 秒</label>
+
+<div id="areaList"></div>
+<div class="empty" id="emptyState">暂无区域，点击「添加」或「屏幕框选」开始</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var areas=[];
+var TYPE_MAP={access_number:'影像号',report_content:'报告内容',report_diagnosis:'诊断结论'};
+var BADGE_MAP={access_number:'bd-a',report_content:'bd-c',report_diagnosis:'bd-d'};
+
+async function loadAreas(){
+  try{
+    var r=await fetch('/api/config');
+    var d=await r.json();
+    if(d.code===0&&d.data){
+      var cfg=d.data;
+      document.getElementById('defaultInterval').value=(cfg.OcrSettings&&cfg.OcrSettings.DefaultIntervalSeconds)||(cfg.Ocr&&cfg.Ocr.DefaultIntervalSeconds)||5;
+      areas=(cfg.OcrSettings&&cfg.OcrSettings.Areas)||(cfg.Ocr&&cfg.Ocr.Areas)||[];
+      renderAreas();
+    }
+  }catch(e){toast('加载失败')}
+}
+
+function renderAreas(){
+  var list=document.getElementById('areaList');
+  if(!areas.length){list.innerHTML='';document.getElementById('emptyState').style.display='block';return}
+  document.getElementById('emptyState').style.display='none';
+  list.innerHTML=areas.map(function(a,i){
+    return '<div class="area" id="area-'+i+'">'+
+      '<div class="area-top">'+
+        '<div style="display:flex;align-items:center;gap:4px;">'+
+          '<span class="area-name">'+esc(a.Name||'')+'</span>'+
+          '<span class="badge '+BADGE_MAP[a.Type]+'">'+TYPE_MAP[a.Type]+'</span>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:4px;">'+
+          '<button class="btn btn-w" style="font-size:10px;padding:2px 6px;" onclick="testArea('+i+')">📸 测试</button>'+
+          '<button class="tgl '+(a.Enabled!==false?'on':'off')+'" onclick="toggleArea('+i+')"></button>'+
+          '<button class="btn btn-d" style="font-size:10px;padding:2px 6px;" onclick="removeArea('+i+')">✕</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="area-cd">'+
+        '<span>X:'+(a.X||0)+' Y:'+(a.Y||0)+'</span>'+
+        '<span>'+(a.Width||200)+'x'+(a.Height||30)+'</span>'+
+        '<span>每'+(a.IntervalSeconds||5)+'秒</span>'+
+      '</div>'+
+      '<div class="area-ctr">'+
+        '<label>名</label><input class="nm" value="'+esc(a.Name||'')+'" onchange="updateArea('+i+',\'Name\',this.value)">'+
+        '<label>类</label><select onchange="updateArea('+i+',\'Type\',this.value)">'+
+          Object.keys(TYPE_MAP).map(function(k){return '<option'+(k===a.Type?' selected':'')+'>'+k+'</option>'}).join('')+
+        '</select>'+
+        '<label>X</label><input type="number" value="'+(a.X||0)+'" onchange="updateArea('+i+',\'X\',+this.value)">'+
+        '<label>Y</label><input type="number" value="'+(a.Y||0)+'" onchange="updateArea('+i+',\'Y\',+this.value)">'+
+        '<label>W</label><input type="number" value="'+(a.Width||200)+'" onchange="updateArea('+i+',\'Width\',+this.value)">'+
+        '<label>H</label><input type="number" value="'+(a.Height||30)+'" onchange="updateArea('+i+',\'Height\',+this.value)">'+
+        '<label>S</label><input type="number" value="'+(a.IntervalSeconds||5)+'" onchange="updateArea('+i+',\'IntervalSeconds\',+this.value)" style="width:32px">'+
+      '</div>'+
+      '<div class="pv" id="pv-'+i+'">'+
+        '<div class="pv-r">'+
+          '<div class="pv-img"><img id="pvi-'+i+'" src="" alt="预览"></div>'+
+          '<div class="pv-info">'+
+            '<div class="pv-txt" id="pvt-'+i+'">等待测试...</div>'+
+            '<div class="pv-meta" id="pvm-'+i+'"></div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function testArea(i){
+  var a=areas[i];
+  var btn=document.querySelector('#area-'+i+' .btn-w');
+  var pv=document.getElementById('pv-'+i);
+  var img=document.getElementById('pvi-'+i);
+  var txt=document.getElementById('pvt-'+i);
+  var meta=document.getElementById('pvm-'+i);
+  btn.textContent='⏳...';btn.disabled=true;
+  pv.classList.add('on');txt.textContent='截取中...';meta.textContent='';
+  try{
+    var r=await fetch('/api/ocr/test-area',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({Name:a.Name,Type:a.Type,X:a.X||0,Y:a.Y||0,Width:a.Width||200,Height:a.Height||30})});
+    var d=await r.json();
+    if(d.code===0&&d.data){
+      var res=d.data;
+      if(res.imageBase64){img.src='data:image/png;base64,'+res.imageBase64;img.style.display='block'}else{img.style.display='none'}
+      txt.textContent=res.ocrText||'(未识别到文字)';
+      var conf=res.ocrConfidence||0;
+      meta.innerHTML=res.ocrSuccess?'<span class="ok">识别成功 '+conf+'%</span>':'<span class="bad">识别失败 '+conf+'%</span>';
+    }else{txt.textContent='测试失败';meta.innerHTML='<span class="bad">'+esc(d.msg||'')+'</span>'}
+  }catch(e){txt.textContent='请求异常';meta.innerHTML='<span class="bad">'+esc(e.message)+'</span>'}
+  btn.textContent='📸 测试';btn.disabled=false;
+}
+
+async function screenPick(){
+  toast('拖拽鼠标框选 OCR 区域，ESC 取消...');
+  try{
+    var r=await fetch('/api/ocr/screen-pick',{method:'POST'});
+    var d=await r.json();
+    if(d.code===0&&d.data){
+      var p=d.data;
+      areas.push({Name:'框选区域'+(areas.length+1),Type:'access_number',X:p.x,Y:p.y,Width:p.width,Height:p.height,IntervalSeconds:5,Enabled:true});
+      renderAreas();
+      await saveAreasSilent();
+      toast('已添加并保存 X:'+p.x+' Y:'+p.y+' '+p.width+'x'+p.height);
+    }else{toast('已取消')}
+  }catch(e){toast('失败:'+esc(e.message))}
+}
+
+async function saveAreasSilent(){
+  try{await fetch('/api/config/ocr-areas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(areas)})}catch(e){}
+}
+
+function addArea(){areas.push({Name:'新区域'+(areas.length+1),Type:'access_number',X:100,Y:50,Width:200,Height:30,IntervalSeconds:5,Enabled:true});renderAreas()}
+function removeArea(i){areas.splice(i,1);renderAreas()}
+function toggleArea(i){areas[i].Enabled=!areas[i].Enabled;renderAreas()}
+function updateArea(i,k,v){areas[i][k]=v}
+
+async function saveAreas(){
+  try{
+    var r=await fetch('/api/config/ocr-areas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(areas)});
+    var d=await r.json();
+    toast(d.code===0?'已保存':'保存失败')
+  }catch(e){toast('保存失败')}
+}
+
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on')},2500)}
+
+loadAreas();
+</script>
+</body>
+</html>

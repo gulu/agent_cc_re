@@ -1,0 +1,224 @@
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
+namespace QCClient
+{
+    /// <summary>配置模型</summary>
+    public class AppConfig
+    {
+        [JsonProperty("BackendSettings")]
+        public BackendSettings Backend { get; set; } = new BackendSettings();
+
+        [JsonProperty("OcrSettings")]
+        public OcrSettings Ocr { get; set; } = new OcrSettings();
+
+        [JsonProperty("WebSettings")]
+        public WebSettings Web { get; set; } = new WebSettings();
+
+        [JsonProperty("Logging")]
+        public LogSettings Logging { get; set; } = new LogSettings();
+    }
+
+    public class BackendSettings
+    {
+        [JsonProperty("QCServiceUrl")]
+        public string QCServiceUrl { get; set; } = "http://localhost:5200";
+
+        [JsonProperty("ReportQCUrl")]
+        public string ReportQCUrl { get; set; } = "http://localhost:5100";
+
+        [JsonProperty("ApiTimeoutSeconds")]
+        public int ApiTimeoutSeconds { get; set; } = 30;
+    }
+
+    public class OcrSettings
+    {
+        [JsonProperty("DefaultIntervalSeconds")]
+        public int DefaultIntervalSeconds { get; set; } = 5;
+
+        [JsonProperty("IdleSeconds")]
+        public int IdleSeconds { get; set; } = 2; // 空闲检测阈值（秒），0=停用
+
+        [JsonProperty("Areas")]
+        public OcrAreaConfig[] Areas { get; set; } = Array.Empty<OcrAreaConfig>();
+    }
+
+    public class OcrAreaConfig
+    {
+        [JsonProperty("Name")]
+        public string Name { get; set; } = "";
+
+        [JsonProperty("Type")]
+        public string Type { get; set; } = "";
+
+        [JsonProperty("X")]
+        public int X { get; set; }
+
+        [JsonProperty("Y")]
+        public int Y { get; set; }
+
+        [JsonProperty("Width")]
+        public int Width { get; set; }
+
+        [JsonProperty("Height")]
+        public int Height { get; set; }
+
+        [JsonProperty("IntervalSeconds")]
+        public int IntervalSeconds { get; set; } = 5;
+
+        [JsonProperty("Enabled")]
+        public bool Enabled { get; set; } = true;
+    }
+
+    public class WebSettings
+    {
+        [JsonProperty("EnableNotification")]
+        public bool EnableNotification { get; set; } = true;
+
+        [JsonProperty("SidebarWidth")]
+        public int SidebarWidth { get; set; } = 320;
+
+        [JsonProperty("AlwaysOnTop")]
+        public bool AlwaysOnTop { get; set; } = true;
+
+        [JsonProperty("EnableSound")]
+        public bool EnableSound { get; set; } = true;
+
+        [JsonProperty("Theme")]
+        public string Theme { get; set; } = "light"; // "light" | "dark"
+
+        [JsonProperty("ShowDebugLog")]
+        public bool ShowDebugLog { get; set; } = true; // 默认显示调试面板，测试时可关闭
+    }
+
+    public class LogSettings
+    {
+        [JsonProperty("LogLevel")]
+        public LogLevelConfig LogLevel { get; set; } = new LogLevelConfig();
+
+        [JsonProperty("File")]
+        public LogFileConfig File { get; set; } = new LogFileConfig();
+    }
+
+    public class LogLevelConfig
+    {
+        [JsonProperty("Default")]
+        public string Default { get; set; } = "Information";
+    }
+
+    public class LogFileConfig
+    {
+        [JsonProperty("Path")]
+        public string Path { get; set; } = "logs\\qcclient-.log";
+
+        [JsonProperty("RollingInterval")]
+        public string RollingInterval { get; set; } = "Day";
+
+        [JsonProperty("RetainedFileCountLimit")]
+        public int RetainedFileCountLimit { get; set; } = 30;
+    }
+
+    /// <summary>配置管理器</summary>
+    public class ConfigHelper
+    {
+        private readonly string _configPath;
+        private AppConfig _config;
+        private readonly object _lock = new object();
+        private DateTime _lastLoadTime;
+        private FileSystemWatcher _watcher;
+
+        public event Action<AppConfig> ConfigChanged;
+
+        public ConfigHelper()
+        {
+            _configPath = FindConfigPath();
+            _config = Load();
+            StartWatcher();
+        }
+
+        private string FindConfigPath()
+        {
+            // 优先使用 exe 所在目录，其次项目目录
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string path = Path.Combine(baseDir, "appsettings.json");
+            if (File.Exists(path)) return path;
+
+            // 回退到项目目录
+            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "appsettings.json");
+            if (File.Exists(path)) return Path.GetFullPath(path);
+
+            return Path.Combine(baseDir, "appsettings.json");
+        }
+
+        public AppConfig Load()
+        {
+            try
+            {
+                if (File.Exists(_configPath))
+                {
+                    string json = File.ReadAllText(_configPath, new System.Text.UTF8Encoding(false));
+                    var cfg = JsonConvert.DeserializeObject<AppConfig>(json);
+                    if (cfg != null)
+                    {
+                        _config = cfg;
+                        _lastLoadTime = File.GetLastWriteTime(_configPath);
+                        return cfg;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Logger.Warning("Failed to load config, using defaults");
+            }
+            _config = new AppConfig();
+            return _config;
+        }
+
+        public AppConfig Get() { lock (_lock) return _config; }
+
+        public void Save(AppConfig config)
+        {
+            lock (_lock)
+            {
+                _config = config;
+                string json = JsonConvert.SerializeObject(config, Formatting.Indented);
+                var utf8NoBom = new UTF8Encoding(false);
+                File.WriteAllText(_configPath, json, utf8NoBom);
+            }
+        }
+
+        public void Reload()
+        {
+            Load();
+            ConfigChanged?.Invoke(_config);
+        }
+
+        private void StartWatcher()
+        {
+            try
+            {
+                string dir = Path.GetDirectoryName(_configPath);
+                string file = Path.GetFileName(_configPath);
+                _watcher = new FileSystemWatcher(dir, file)
+                {
+                    NotifyFilter = NotifyFilters.LastWrite,
+                    EnableRaisingEvents = true
+                };
+                _watcher.Changed += (s, e) =>
+                {
+                    try
+                    {
+                        // 防抖
+                        System.Threading.Thread.Sleep(500);
+                        var lastWrite = File.GetLastWriteTime(_configPath);
+                        if (lastWrite != _lastLoadTime) Reload();
+                    }
+                    catch { /* ignore watcher errors */ }
+                };
+            }
+            catch { /* watcher setup failed - non-critical */ }
+        }
+    }
+}

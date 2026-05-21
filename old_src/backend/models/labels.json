@@ -1,0 +1,7 @@
+{
+  "O": 0,
+  "B-error": 1,
+  "I-error": 2,
+  "B-term": 3,
+  "I-term": 4
+}
