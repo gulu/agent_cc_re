@@ -13,6 +13,7 @@
     <PackageReference Include="FreeSql.Provider.PostgreSQL" Version="3.5.309" />
     <PackageReference Include="FreeSql.Provider.Oracle" Version="3.5.309" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+    <PackageReference Include="YamlDotNet" Version="16.2.1" />
   </ItemGroup>
 
 </Project>

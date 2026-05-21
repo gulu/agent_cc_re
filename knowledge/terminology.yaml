@@ -1,0 +1,606 @@
+# Agent_QC Terminology Standards
+# Auto-generated from old_src/backend/Services/DbSeed.cs
+# Entries: 101
+
+- category: anatomy
+  non_standard_terms:
+  - 右上肺
+  - 右肺上部
+  - 右上叶
+  - 右肺上
+  standard_term: 右肺上叶
+- category: anatomy
+  non_standard_terms:
+  - 右中肺
+  - 右肺中部
+  - 右中叶
+  - 右肺中
+  standard_term: 右肺中叶
+- category: anatomy
+  non_standard_terms:
+  - 右下肺
+  - 右肺下部
+  - 右下叶
+  - 右肺下
+  standard_term: 右肺下叶
+- category: anatomy
+  non_standard_terms:
+  - 左上肺
+  - 左肺上部
+  - 左上叶
+  - 左肺上
+  standard_term: 左肺上叶
+- category: anatomy
+  non_standard_terms:
+  - 左下肺
+  - 左肺下部
+  - 左下叶
+  - 左肺下
+  standard_term: 左肺下叶
+- category: anatomy
+  non_standard_terms:
+  - 甲状腺左
+  - 左侧甲状腺
+  - 左甲
+  - 左甲状腺叶
+  standard_term: 甲状腺左叶
+- category: anatomy
+  non_standard_terms:
+  - 甲状腺右
+  - 右侧甲状腺
+  - 右甲
+  - 右甲状腺叶
+  standard_term: 甲状腺右叶
+- category: anatomy
+  non_standard_terms:
+  - 肝脏右叶
+  - 肝右
+  - 右肝
+  - 右半肝
+  standard_term: 肝右叶
+- category: anatomy
+  non_standard_terms:
+  - 肝脏左叶
+  - 肝左
+  - 左肝
+  - 左半肝
+  standard_term: 肝左叶
+- category: anatomy
+  non_standard_terms:
+  - 肝尾叶
+  - 尾叶肝
+  - 肝尾
+  standard_term: 肝尾状叶
+- category: anatomy
+  non_standard_terms:
+  - 肝脏5段
+  - S5肝段
+  - 肝五段
+  standard_term: 肝S5段
+- category: anatomy
+  non_standard_terms:
+  - 肝脏6段
+  - S6肝段
+  - 肝六段
+  standard_term: 肝S6段
+- category: anatomy
+  non_standard_terms:
+  - 肝脏7段
+  - S7肝段
+  - 肝七段
+  standard_term: 肝S7段
+- category: anatomy
+  non_standard_terms:
+  - 肝脏8段
+  - S8肝段
+  - 肝八段
+  standard_term: 肝S8段
+- category: anatomy
+  non_standard_terms:
+  - 肾孟
+  - 肾孟部
+  - 肾盂部
+  standard_term: 肾盂
+- category: anatomy
+  non_standard_terms:
+  - 肾盏
+  - 肾盏部
+  standard_term: 肾盏
+- category: anatomy
+  non_standard_terms:
+  - 输尿管
+  - 输柰管
+  - 输尿官
+  standard_term: 输尿管
+- category: anatomy
+  non_standard_terms:
+  - 胰线
+  - 胰線
+  - 胰
+  standard_term: 胰腺
+- category: anatomy
+  non_standard_terms:
+  - 胆囊
+  - 胆琅
+  standard_term: 胆囊
+- category: anatomy
+  non_standard_terms:
+  - 烂尾
+  - 兰尾
+  - 阑尾
+  standard_term: 阑尾
+- category: anatomy
+  non_standard_terms:
+  - 拐杖
+  - 腋下拐
+  - 腋拐
+  standard_term: 腋杖
+- category: anatomy
+  non_standard_terms:
+  - 胳骨
+  - 髋骨
+  - 髂
+  standard_term: 髂骨
+- category: anatomy
+  non_standard_terms:
+  - 底骨
+  - 胝骨
+  - 骶
+  standard_term: 骶骨
+- category: anatomy
+  non_standard_terms:
+  - 额页
+  - 额叶
+  standard_term: 额叶
+- category: anatomy
+  non_standard_terms:
+  - 颞页
+  - 颞叶
+  - 镊叶
+  standard_term: 颞叶
+- category: anatomy
+  non_standard_terms:
+  - 枕页
+  - 枕叶
+  standard_term: 枕叶
+- category: anatomy
+  non_standard_terms:
+  - 顶页
+  - 顶叶
+  standard_term: 顶叶
+- category: anatomy
+  non_standard_terms:
+  - 骈胝体
+  - 胼眂体
+  - 胼眡体
+  standard_term: 胼胝体
+- category: anatomy
+  non_standard_terms:
+  - 垂休
+  - 锤体
+  - 垂
+  standard_term: 垂体
+- category: anatomy
+  non_standard_terms:
+  - 蝶安
+  - 蝶案
+  standard_term: 蝶鞍
+- category: anatomy
+  non_standard_terms:
+  - 海棉窦
+  - 海绵豆
+  standard_term: 海绵窦
+- category: anatomy
+  non_standard_terms:
+  - 椎休
+  - 锥体
+  standard_term: 椎体
+- category: anatomy
+  non_standard_terms:
+  - 硬膜嚢
+  - 硬瞙囊
+  standard_term: 硬膜囊
+- category: anatomy
+  non_standard_terms:
+  - 蛛网瞙
+  - 蛛网膜
+  standard_term: 蛛网膜
+- category: anatomy
+  non_standard_terms:
+  - 喷门
+  - 贲門
+  standard_term: 贲门
+- category: anatomy
+  non_standard_terms:
+  - 幽門
+  - 悠门
+  standard_term: 幽门
+- category: anatomy
+  non_standard_terms:
+  - 十二脂肠
+  - 十二指肠
+  standard_term: 十二指肠
+- category: anatomy
+  non_standard_terms:
+  - 回盲
+  - 回肓部
+  - 回肓
+  standard_term: 回盲部
+- category: anatomy
+  non_standard_terms:
+  - 纵膈
+  - 综隔
+  - 纵隔膜
+  standard_term: 纵隔
+- category: anatomy
+  non_standard_terms:
+  - 横隔
+  - 膈肌
+  standard_term: 横膈
+- category: anatomy
+  non_standard_terms:
+  - 腋下
+  - 腋部
+  - 叶窝
+  standard_term: 腋窝
+- category: anatomy
+  non_standard_terms:
+  - 腹瞙
+  - 腹膜
+  standard_term: 腹膜
+- category: anatomy
+  non_standard_terms:
+  - 胸瞙
+  - 胸膜
+  standard_term: 胸膜
+- category: anatomy
+  non_standard_terms:
+  - 肾脏皮质
+  - 肾皮贽
+  standard_term: 肾皮质
+- category: anatomy
+  non_standard_terms:
+  - 肾脏髓质
+  - 肾腄质
+  standard_term: 肾髓质
+- category: anatomy
+  non_standard_terms:
+  - 痞脏
+  - 皮脏
+  - 啤脏
+  standard_term: 脾脏
+- category: anatomy
+  non_standard_terms:
+  - 前列线
+  - 前列
+  standard_term: 前列腺
+- category: anatomy
+  non_standard_terms:
+  - 精囊腺
+  - 精囊腺体
+  standard_term: 精囊
+- category: anatomy
+  non_standard_terms:
+  - 付睾
+  - 附塞
+  - 副睾
+  standard_term: 附睾
+- category: imaging_sign
+  non_standard_terms:
+  - 低密谋灶
+  - 低密灶
+  - 低密度影
+  - 低密影
+  standard_term: 低密度灶
+- category: imaging_sign
+  non_standard_terms:
+  - 高密灶
+  - 高密度影
+  - 高密影
+  - 致密灶
+  standard_term: 高密度灶
+- category: imaging_sign
+  non_standard_terms:
+  - 等密谋
+  - 等密
+  - 同等密度
+  standard_term: 等密度
+- category: imaging_sign
+  non_standard_terms:
+  - 轨道症
+  - 轨迹征
+  - 导水管征
+  standard_term: 轨道征
+- category: imaging_sign
+  non_standard_terms:
+  - 刺征
+  - 毛刺症
+  - 锯齿征
+  - 毛刺样
+  standard_term: 毛刺征
+- category: imaging_sign
+  non_standard_terms:
+  - 分页症
+  - 分叶症
+  - 分叶样
+  standard_term: 分叶征
+- category: imaging_sign
+  non_standard_terms:
+  - 胸膜牵拉征
+  - 胸膜凹陷症
+  - 胸膜尾征
+  - 兔耳征
+  standard_term: 胸膜凹陷征
+- category: imaging_sign
+  non_standard_terms:
+  - 血管聚集征
+  - 集束征
+  - 血管聚集
+  standard_term: 血管集束征
+- category: imaging_sign
+  non_standard_terms:
+  - 空泡症
+  - 含气腔
+  - 空洞征
+  standard_term: 空泡征
+- category: imaging_sign
+  non_standard_terms:
+  - 支气管充气征
+  - 含气支气管征
+  - 空气支气管征
+  standard_term: 充气支气管征
+- category: imaging_sign
+  non_standard_terms:
+  - 磨玻璃样
+  - 毛玻璃密度
+  - 毛玻璃影
+  - GGO
+  standard_term: 磨玻璃密度
+- category: imaging_sign
+  non_standard_terms:
+  - 钙化灶
+  - 钙化点
+  - 钙化斑
+  - 钙化斑块
+  standard_term: 钙化
+- category: imaging_sign
+  non_standard_terms:
+  - 坏死灶
+  - 坏死区
+  - 坏列
+  - 坏列灶
+  standard_term: 坏死
+- category: imaging_sign
+  non_standard_terms:
+  - 囊性变
+  - 囊性变化
+  - 囊变区
+  standard_term: 囊变
+- category: imaging_sign
+  non_standard_terms:
+  - 不典型强化
+  - 增强程度异常
+  - 非典型强化
+  standard_term: 异常强化
+- category: imaging_sign
+  non_standard_terms:
+  - 环状强化
+  - 圈状强化
+  - 轮状强化
+  standard_term: 环形强化
+- category: imaging_sign
+  non_standard_terms:
+  - 不均一强化
+  - 非均匀强化
+  - 不均匀增强
+  standard_term: 不均匀强化
+- category: imaging_sign
+  non_standard_terms:
+  - 进行性强化
+  - 逐渐强化
+  - 慢慢强化
+  standard_term: 渐进性强化
+- category: imaging_sign
+  non_standard_terms:
+  - 快进快出型
+  - 速升速降
+  - 快进型
+  standard_term: 快进快出
+- category: imaging_sign
+  non_standard_terms:
+  - 快进慢出型
+  - 快进迟出
+  - 快进型
+  standard_term: 快进慢出
+- category: imaging_sign
+  non_standard_terms:
+  - 胆结石
+  - 胆囊内结石
+  - 石头
+  standard_term: 胆囊结石
+- category: imaging_sign
+  non_standard_terms:
+  - 胆总管结石
+  - 胆管石头
+  - 总胆管结石
+  standard_term: 胆总管结石
+- category: imaging_sign
+  non_standard_terms:
+  - 肾脏结石
+  - 肾内结石
+  - 肾石头
+  standard_term: 肾结石
+- category: imaging_sign
+  non_standard_terms:
+  - 输尿管结石
+  - 输尿管石头
+  standard_term: 输尿管结石
+- category: imaging_sign
+  non_standard_terms:
+  - 脑梗塞
+  - 脑梗
+  - 缺血灶
+  - 缺血性
+  standard_term: 脑梗死
+- category: imaging_sign
+  non_standard_terms:
+  - 脑内出血
+  - 颅内血肿
+  - 脑溢血
+  standard_term: 脑出血
+- category: imaging_sign
+  non_standard_terms:
+  - 蛛网膜出血
+  - 蛛血
+  - 蛛膜下出血
+  standard_term: 蛛网膜下腔出血
+- category: imaging_sign
+  non_standard_terms:
+  - 硬膜下出血
+  - 硬膜下积血
+  - 硬膜下血肿
+  standard_term: 硬膜下血肿
+- category: imaging_sign
+  non_standard_terms:
+  - 硬膜外出血
+  - 硬膜外积血
+  standard_term: 硬膜外血肿
+- category: imaging_sign
+  non_standard_terms:
+  - 肺气肿
+  - 肺大疱
+  - 肺大泡
+  standard_term: 肺气肿
+- category: imaging_sign
+  non_standard_terms:
+  - 胸水
+  - 胸积液
+  - 胸腹腔积液
+  standard_term: 胸腔积液
+- category: imaging_sign
+  non_standard_terms:
+  - 心包积液
+  - 心包内液
+  - 心囊积液
+  standard_term: 心包积液
+- category: imaging_sign
+  non_standard_terms:
+  - 腹水
+  - 腹积液
+  - 腹腔内积液
+  standard_term: 腹腔积液
+- category: imaging_sign
+  non_standard_terms:
+  - 盆腔积液
+  - 盆水
+  - 盆腔内液
+  standard_term: 盆腔积液
+- category: imaging_sign
+  non_standard_terms:
+  - 肝脏囊肿
+  - 肝内囊肿
+  - 肝囊性
+  standard_term: 肝囊肿
+- category: imaging_sign
+  non_standard_terms:
+  - 肾脏囊肿
+  - 肾内囊肿
+  - 肾囊性
+  standard_term: 肾囊肿
+- category: imaging_sign
+  non_standard_terms:
+  - 脂肪肝
+  - 肝脂肪变
+  - 肝脂
+  standard_term: 脂肪肝
+- category: imaging_sign
+  non_standard_terms:
+  - 肝纤维化
+  - 硬变肝
+  - 肝硬
+  standard_term: 肝硬化
+- category: imaging_sign
+  non_standard_terms:
+  - 骨拆
+  - 骨裂痕
+  - 折骨
+  standard_term: 骨折
+- category: imaging_sign
+  non_standard_terms:
+  - 骨松
+  - 骨质硫松
+  - 骨质量疏松
+  standard_term: 骨质疏松
+- category: imaging_sign
+  non_standard_terms:
+  - 骨刺
+  - 骨赘
+  - 骨增生
+  standard_term: 骨质增生
+- category: imaging_sign
+  non_standard_terms:
+  - 椎间盘脱出
+  - 间盘突出
+  - 盘突出
+  standard_term: 椎间盘突出
+- category: imaging_sign
+  non_standard_terms:
+  - 间盘膨出
+  - 盘膨出
+  - 椎间盘膨胀
+  standard_term: 椎间盘膨出
+- category: imaging_sign
+  non_standard_terms:
+  - 淋巴肿大
+  - 淋巴节增大
+  - 淋大
+  standard_term: 淋巴结肿大
+- category: imaging_sign
+  non_standard_terms:
+  - 动脉硬化
+  - 粥样硬化
+  - 动脉斑块
+  standard_term: 动脉粥样硬化
+- category: procedure
+  non_standard_terms:
+  - CT平扫+三维
+  - CT平扫三维
+  - CT平扫加三维
+  standard_term: CT平扫
+- category: procedure
+  non_standard_terms:
+  - CT加强
+  - CT增强扫描
+  - 增强CT
+  standard_term: CT增强
+- category: procedure
+  non_standard_terms:
+  - 核磁平扫
+  - 磁共振平扫
+  - MR平扫
+  standard_term: MRI平扫
+- category: procedure
+  non_standard_terms:
+  - 核磁增强
+  - 磁共振增强
+  - MR增强
+  - 增强MRI
+  standard_term: MRI增强
+- category: procedure
+  non_standard_terms:
+  - 3D重建
+  - 三维重构
+  - 3维重建
+  standard_term: 三维重建
+- category: procedure
+  non_standard_terms:
+  - MPR
+  - 多个平面重建
+  - 多维重建
+  standard_term: 多平面重建
+- category: procedure
+  non_standard_terms:
+  - MIP
+  - 最大密度投射
+  - 密度投影
+  standard_term: 最大密度投影
