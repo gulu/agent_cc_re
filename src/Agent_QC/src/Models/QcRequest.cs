@@ -13,5 +13,6 @@ public class QcRequest
     public string? RequestDepartment { get; set; }
     public string? ExamPart { get; set; }
     public string? ExamMethod { get; set; }
+    public string? ExamDevice { get; set; }
     public string? AccessionNo { get; set; }
 }
