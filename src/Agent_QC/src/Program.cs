@@ -36,6 +36,15 @@ builder.Services.AddSingleton(freeSql);
 // ── QC 服务 ─────────────────────────────────────────
 builder.Services.AddSingleton<IQcService, QcService>();
 
+// ── vLLM + Skill Squad ────────────────────────────
+var vllmEndpoint = builder.Configuration["Vllm:Endpoint"] ?? "http://localhost:8100";
+var vllmModel = builder.Configuration["Vllm:Model"] ?? "qwen3.5-9b";
+var vllmClient = new VllmClient(new HttpClient(), vllmEndpoint, vllmModel);
+builder.Services.AddSingleton<IVllmClient>(vllmClient);
+builder.Services.AddSingleton(new SkillRegistry("knowledge/skills"));
+builder.Services.AddSingleton<HermesOrchestrator>();
+builder.Services.AddSingleton<QaArbiter>();
+
 // ── 控制器 ─────────────────────────────────────────
 builder.Services.AddControllers()
     .AddJsonOptions(opts =>

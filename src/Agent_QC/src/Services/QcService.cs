@@ -42,8 +42,22 @@ public class QcService : IQcService
     // Level 4: 危急值
     private readonly CriticalSignRule _criticalSignRule = new();
 
+    // Hermes Skill Squad (LLM 增强层)
+    private readonly IVllmClient _vllm;
+    private readonly SkillRegistry _skillRegistry;
+    private readonly HermesOrchestrator _orchestrator;
+    private readonly QaArbiter _arbiter;
+
     // 评分
     private readonly ScoringEngine _scoringEngine = new();
+
+    public QcService(IVllmClient? vllm = null, SkillRegistry? skillRegistry = null)
+    {
+        _vllm = vllm ?? new VllmClient(new HttpClient(), "http://localhost:8100");
+        _skillRegistry = skillRegistry ?? new SkillRegistry();
+        _orchestrator = new HermesOrchestrator(_vllm, _skillRegistry);
+        _arbiter = new QaArbiter();
+    }
 
     public async Task<AjaxResult> ExecuteQcAsync(QcRequest request)
     {
@@ -79,6 +93,15 @@ public class QcService : IQcService
 
         // ── Level 4: 危急值 ──
         issues.AddRange(_criticalSignRule.Check(request));
+
+        // ── Skill Squad (LLM 增强，vLLM 可用时) ──
+        if (_vllm.Health == VllmHealthStatus.Healthy)
+        {
+            var ruleIssues = new List<QcIssueDto>(issues);
+            var skillResults = await _orchestrator.DispatchAsync(request, ruleIssues, CancellationToken.None);
+            if (skillResults.Count > 0)
+                issues = await _arbiter.ArbitrateAsync(ruleIssues, skillResults);
+        }
 
         sw.Stop();
 
