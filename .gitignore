@@ -1,0 +1,39 @@
+# .NET build outputs
+bin/
+obj/
+*.suo
+*.user
+*.cache
+*.dll
+*.exe
+
+# IDE
+.vs/
+.idea/
+*.swp
+*.slnx
+
+# Model files (not in git)
+*.onnx
+*.onnx.data
+*.gguf
+*.bin
+*.safetensors
+
+# Data
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets
+*.secret.*
+appsettings.*.json
+!appsettings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
