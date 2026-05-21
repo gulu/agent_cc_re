@@ -38,7 +38,7 @@ builder.Services.AddSingleton<IQcService, QcService>();
 
 // ── vLLM + Skill Squad ────────────────────────────
 var vllmEndpoint = builder.Configuration["Vllm:Endpoint"] ?? "http://localhost:8100";
-var vllmModel = builder.Configuration["Vllm:Model"] ?? "qwen3.5-9b";
+var vllmModel = builder.Configuration["Vllm:Model"] ?? "/home/gulu/.cache/modelscope/hub/models/Qwen/Qwen3-4B-AWQ";
 var vllmClient = new VllmClient(new HttpClient(), vllmEndpoint, vllmModel);
 builder.Services.AddSingleton<IVllmClient>(vllmClient);
 builder.Services.AddSingleton(new SkillRegistry("knowledge/skills"));

@@ -13,7 +13,7 @@ public class VllmClient : IVllmClient
 
     public VllmHealthStatus Health { get; private set; } = VllmHealthStatus.Unavailable;
 
-    public VllmClient(HttpClient http, string endpoint, string model = "qwen3.5-9b")
+    public VllmClient(HttpClient http, string endpoint, string model = "/home/gulu/.cache/modelscope/hub/models/Qwen/Qwen3-4B-AWQ")
     {
         _http = http;
         _endpoint = endpoint.TrimEnd('/');
