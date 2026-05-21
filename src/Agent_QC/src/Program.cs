@@ -40,6 +40,11 @@ builder.Services.AddSingleton<IQcService, QcService>();
 var vllmEndpoint = builder.Configuration["Vllm:Endpoint"] ?? "http://localhost:8100";
 var vllmModel = builder.Configuration["Vllm:Model"] ?? "/home/gulu/.cache/modelscope/hub/models/Qwen/Qwen3-4B-AWQ";
 var vllmClient = new VllmClient(new HttpClient(), vllmEndpoint, vllmModel);
+_ = vllmClient.CheckHealthAsync().ContinueWith(t =>
+{
+    var status = t.GetAwaiter().GetResult() ? "healthy" : "unavailable";
+    Console.WriteLine($"[VllmClient] vLLM health check: {status}");
+});
 builder.Services.AddSingleton<IVllmClient>(vllmClient);
 builder.Services.AddSingleton(new SkillRegistry("knowledge/skills"));
 builder.Services.AddSingleton<HermesOrchestrator>();
