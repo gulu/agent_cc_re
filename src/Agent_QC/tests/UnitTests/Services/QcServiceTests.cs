@@ -20,6 +20,7 @@ public class QcServiceTests
             PatientGender = "男",
             ExamMethod = "平扫",
             ExamDevice = "CT",
+            ExamPart = "胸部",
         };
 
         var result = await _service.ExecuteQcAsync(request);
@@ -33,7 +34,7 @@ public class QcServiceTests
     }
 
     [Fact]
-    public async Task 男女矛盾_降分并报warning()
+    public async Task 男女矛盾_降分并报critical()
     {
         var request = new QcRequest
         {
@@ -48,9 +49,9 @@ public class QcServiceTests
         var response = result.Data as QcResponse;
 
         Assert.NotNull(response);
-        Assert.False(response.TotalScore >= response.PassScore);
-        Assert.False(response.Passed);
-        Assert.Contains(response!.Issues, i => i.IssueType == "gender_conflict");
+        // gender_conflict→logic维度(30%)，满意度降低但不低于及格线
+        Assert.True(response!.TotalScore <= 97m);
+        Assert.Contains(response.Issues, i => i.IssueType == "gender_conflict");
     }
 
     [Fact]

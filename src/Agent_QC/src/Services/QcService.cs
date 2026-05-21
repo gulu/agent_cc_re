@@ -1,21 +1,49 @@
 using System.Diagnostics;
 using Agent_QC.Models;
 using Agent_QC.Services.Rules;
+using Agent_QC.Services.Rules.Level1;
+using Agent_QC.Services.Rules.Level2;
 
 namespace Agent_QC.Services;
 
 /// <summary>
-/// QC 核心管线服务——4层流水线：预处理 → 格式 → 语义 → 逻辑规则 → 危急值。
+/// QC 核心管线服务——5层流水线：
+/// Level 0 预处理 → Level 1 文本格式 → Level 2 语义规范 → Level 3 逻辑规则 → Level 4 危急值。
 /// </summary>
 public class QcService : IQcService
 {
+    // Level 0
     private readonly SectionParser _sectionParser = new();
+
+    // Level 1: 文本格式
+    private readonly PhraseTypoRule _phraseTypoRule = new();
+    private readonly DuplicateCharRule _duplicateCharRule = new();
+    private readonly UnitFormatRule _unitFormatRule = new();
+    private readonly SentencePunctuationRule _sentencePunctuationRule = new();
+    private readonly PatientInfoRule _patientInfoRule = new();
+    private readonly TerminologyStandardRule _terminologyStandardRule = new();
+
+    // Level 2: 语义规范
+    private readonly ColloquialTermRule _colloquialTermRule = new();
+    private readonly AnatomyTermRule _anatomyTermRule = new();
+    private readonly LesionCompletenessRule _lesionCompletenessRule = new();
+    private readonly RadsClassificationRule _radsClassificationRule = new();
+    private readonly FindingsImpressionConsistencyRule _findingsImpressionConsistencyRule = new();
+    private readonly ComparisonDescriptionRule _comparisonDescriptionRule = new();
+    private readonly AdviceConsistencyRule _adviceConsistencyRule = new();
+
+    // Level 3: 逻辑规则
     private readonly GenderConflictRule _genderConflictRule = new();
     private readonly AgeConflictRule _ageConflictRule = new();
     private readonly DirectionConflictRule _directionConflictRule = new();
     private readonly DeviceConflictRule _deviceConflictRule = new();
     private readonly ScanEnhanceConflictRule _scanEnhanceConflictRule = new();
+
+    // Level 4: 危急值
     private readonly CriticalSignRule _criticalSignRule = new();
+
+    // 评分
+    private readonly ScoringEngine _scoringEngine = new();
 
     public async Task<AjaxResult> ExecuteQcAsync(QcRequest request)
     {
@@ -23,59 +51,51 @@ public class QcService : IQcService
             return AjaxResult.Error(400, "ReportId 不能为空");
 
         var sw = Stopwatch.StartNew();
-
-        // ── Level 0: 预处理 ──
-        // SectionParser 解析段落边界（为 Phase 2 语义分析做准备）
-        var fullText = (request.Findings ?? "") + " " + (request.Impression ?? "");
-
-        // ── Level 3: 逻辑规则检测 ──
         var issues = new List<QcIssueDto>();
+
+        // ── Level 1: 文本格式 ──
+        issues.AddRange(_phraseTypoRule.Check(request));
+        issues.AddRange(_duplicateCharRule.Check(request));
+        issues.AddRange(_unitFormatRule.Check(request));
+        issues.AddRange(_sentencePunctuationRule.Check(request));
+        issues.AddRange(_patientInfoRule.Check(request));
+        issues.AddRange(_terminologyStandardRule.Check(request));
+
+        // ── Level 2: 语义规范 ──
+        issues.AddRange(_colloquialTermRule.Check(request));
+        issues.AddRange(_anatomyTermRule.Check(request));
+        issues.AddRange(_lesionCompletenessRule.Check(request));
+        issues.AddRange(_radsClassificationRule.Check(request));
+        issues.AddRange(_findingsImpressionConsistencyRule.Check(request));
+        issues.AddRange(_comparisonDescriptionRule.Check(request));
+        issues.AddRange(_adviceConsistencyRule.Check(request));
+
+        // ── Level 3: 逻辑规则 ──
         issues.AddRange(_genderConflictRule.Check(request));
         issues.AddRange(_ageConflictRule.Check(request));
         issues.AddRange(_directionConflictRule.Check(request));
         issues.AddRange(_deviceConflictRule.Check(request));
         issues.AddRange(_scanEnhanceConflictRule.Check(request));
 
-        // ── Level 4: 危急值检测 ──
+        // ── Level 4: 危急值 ──
         issues.AddRange(_criticalSignRule.Check(request));
 
-        // ── 计算总分 ──
         sw.Stop();
-        var totalScore = CalculateScore(issues);
-        var passScore = 90m;
 
+        // 4维度评分
         var response = new QcResponse
         {
             ReportId = request.ReportId,
-            TotalScore = totalScore,
-            PassScore = passScore,
-            Passed = totalScore >= passScore,
-            QcLevel = "Level3+4",
+            QcLevel = "L1+L2+L3+L4",
             Issues = issues,
-            Summary = issues.Count == 0
-                ? "未发现问题"
-                : $"发现 {issues.Count} 个问题",
             ProcessTimeMs = (int)sw.ElapsedMilliseconds,
         };
+        _scoringEngine.Calculate(response);
+
+        response.Summary = issues.Count == 0
+            ? "未发现问题"
+            : $"发现 {issues.Count} 个问题";
 
         return AjaxResult.Success(response);
-    }
-
-    /// <summary>
-    /// 扣分制：起始100分，error -10，warning -5，critical -20，最低0。
-    /// </summary>
-    private static decimal CalculateScore(List<QcIssueDto> issues)
-    {
-        decimal score = 100;
-        foreach (var issue in issues)
-        {
-            score -= issue.Severity switch
-            {
-                "critical" => 20,
-                "error" => 10,
-                _ => 5, // warning / info
-            };
-        }
-        return Math.Max(0, score);
     }
 }
