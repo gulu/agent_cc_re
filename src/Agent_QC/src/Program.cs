@@ -1,0 +1,69 @@
+using FreeSql;
+using FreeSql.Internal;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ── 数据库配置 ──────────────────────────────────────
+var dbConfig = builder.Configuration.GetSection("Database");
+var dbType = (dbConfig["Type"] ?? "SQLite").ToUpperInvariant();
+
+var dataType = dbType switch
+{
+    "POSTGRESQL" => DataType.PostgreSQL,
+    "ORACLE" => DataType.Oracle,
+    _ => DataType.Sqlite
+};
+
+var connStr = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+    ?? dbConfig["ConnectionString"]
+    ?? "Data Source=Data/qc.db";
+
+if (dataType == DataType.Sqlite)
+{
+    var dataDir = Path.Combine(AppContext.BaseDirectory, "Data");
+    Directory.CreateDirectory(dataDir);
+    connStr = $"Data Source={Path.Combine(dataDir, "qc.db")}";
+}
+
+var freeSql = new FreeSqlBuilder()
+    .UseConnectionString(dataType, connStr)
+    .UseNameConvert(NameConvertType.PascalCaseToUnderscore)
+    .Build();
+
+builder.Services.AddSingleton(freeSql);
+
+// ── 控制器 ─────────────────────────────────────────
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.PropertyNamingPolicy =
+            System.Text.Json.JsonNamingPolicy.CamelCase;
+        opts.JsonSerializerOptions.DefaultIgnoreCondition =
+            System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// ── CORS ───────────────────────────────────────────
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
+});
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseCors("AllowAll");
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();

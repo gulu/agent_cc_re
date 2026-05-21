@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Agent_QC</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FreeSql" Version="3.5.309" />
+    <PackageReference Include="FreeSql.Provider.Sqlite" Version="3.5.309" />
+    <PackageReference Include="FreeSql.Provider.PostgreSQL" Version="3.5.309" />
+    <PackageReference Include="FreeSql.Provider.Oracle" Version="3.5.309" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+  </ItemGroup>
+
+</Project>
