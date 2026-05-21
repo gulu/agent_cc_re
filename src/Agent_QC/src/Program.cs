@@ -1,5 +1,6 @@
 using FreeSql;
 using FreeSql.Internal;
+using Agent_QC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,9 @@ var freeSql = new FreeSqlBuilder()
     .Build();
 
 builder.Services.AddSingleton(freeSql);
+
+// ── QC 服务 ─────────────────────────────────────────
+builder.Services.AddSingleton<IQcService, QcService>();
 
 // ── 控制器 ─────────────────────────────────────────
 builder.Services.AddControllers()
