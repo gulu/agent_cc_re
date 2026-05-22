@@ -78,6 +78,7 @@ public class HermesOrchestrator
                 new() { Role = "system", Content = systemPrompt },
                 new() { Role = "user", Content = userPrompt },
             },
+            ResponseFormat = new ResponseFormat { Type = "json_object" },
         };
 
         var response = await _vllm.ChatAsync(chatRequest, ct);

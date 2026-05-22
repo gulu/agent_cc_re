@@ -6,8 +6,14 @@ public class VllmChatRequest
 {
     public string Model { get; set; } = "/home/gulu/.cache/modelscope/hub/models/Qwen/Qwen3-4B-AWQ";
     public List<VllmMessage> Messages { get; set; } = new();
-    public int MaxTokens { get; set; } = 512;
+    public int MaxTokens { get; set; } = 256;
     public float Temperature { get; set; } = 0.1f;
+    public ResponseFormat? ResponseFormat { get; set; }
+}
+
+public class ResponseFormat
+{
+    public string Type { get; set; } = "json_object";
 }
 
 public class VllmMessage
@@ -25,19 +31,11 @@ public class VllmChatResponse
         {
             var content = Choices.FirstOrDefault()?.Message?.Content;
             if (content == null) return null;
-            // 剥离 Qwen3 思考标签
-            var idx = content.IndexOf("<｜end▁of▁thinking｜>", StringComparison.Ordinal);
+            // 后备：剥离 Qwen3 思考标签（JSON 约束解码下不应出现）
+            const string closeTag = "</think>";
+            int idx = content.IndexOf(closeTag, StringComparison.Ordinal);
             if (idx >= 0)
-                content = content[(idx + 9)..].TrimStart();
-            // 兼容 <think>...</think> 格式
-            const string thinkOpen = "<think>";
-            const string thinkClose = "</think>";
-            if (content.StartsWith(thinkOpen))
-            {
-                var closeIdx = content.IndexOf(thinkClose);
-                if (closeIdx >= 0)
-                    content = content[(closeIdx + thinkClose.Length)..].TrimStart();
-            }
+                content = content[(idx + closeTag.Length)..].TrimStart();
             return content;
         }
     }
