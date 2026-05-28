@@ -86,9 +86,11 @@ namespace QCClient
         {
             try
             {
-                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
-                    @"Software\Microsoft\Windows\CurrentVersion\Run", false);
-                return key?.GetValue("QCClient") != null;
+                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                    @"Software\Microsoft\Windows\CurrentVersion\Run", false))
+                {
+                    return key?.GetValue("QCClient") != null;
+                }
             }
             catch { return false; }
         }
@@ -97,12 +99,14 @@ namespace QCClient
         {
             try
             {
-                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
-                    @"Software\Microsoft\Windows\CurrentVersion\Run", true);
-                if (enable)
-                    key?.SetValue("QCClient", Application.ExecutablePath);
-                else
-                    key?.DeleteValue("QCClient", false);
+                using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                    @"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                {
+                    if (enable)
+                        key?.SetValue("QCClient", Application.ExecutablePath);
+                    else
+                        key?.DeleteValue("QCClient", false);
+                }
             }
             catch (Exception ex)
             {

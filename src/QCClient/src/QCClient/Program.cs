@@ -1,13 +1,14 @@
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
 
 namespace QCClient
 {
@@ -20,9 +21,26 @@ namespace QCClient
         private static TrayService _tray;
         private static MainForm _mainForm;
 
+        // 导入Windows API函数
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool FreeConsole();
+
         [STAThread]
         static void Main()
         {
+
+            // ✅ 在所有Console调用之前分配控制台
+            AllocConsole();
+
+            Console.Title = "QCClient - 放射科报告质控助手";
+            Console.WriteLine("═══ QCClient 启动中... ═══");
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
             Console.Title = "QCClient - 放射科报告质控助手";
             Console.WriteLine("═══ QCClient 启动中... ═══");
 
@@ -372,21 +390,49 @@ namespace QCClient
             }
 
             string ext = Path.GetExtension(filePath).ToLowerInvariant();
-            string contentType = ext switch
+
+            string contentType;
+            switch (ext)
             {
-                ".html" => "text/html; charset=utf-8",
-                ".css" => "text/css; charset=utf-8",
-                ".js" => "application/javascript; charset=utf-8",
-                ".json" => "application/json",
-                ".png" => "image/png",
-                ".jpg" or ".jpeg" => "image/jpeg",
-                ".gif" => "image/gif",
-                ".svg" => "image/svg+xml",
-                ".ico" => "image/x-icon",
-                ".woff" => "font/woff",
-                ".woff2" => "font/woff2",
-                _ => "application/octet-stream",
-            };
+                case ".html":
+                    contentType = "text/html; charset=utf-8";
+                    break;
+                case ".css":
+                    contentType = "text/css; charset=utf-8";
+                    break;
+                case ".js":
+                    contentType = "application/javascript; charset=utf-8";
+                    break;
+                case ".json":
+                    contentType = "application/json";
+                    break;
+                case ".png":
+                    contentType = "image/png";
+                    break;
+                case ".jpg":
+                case ".jpeg": // 多个case匹配同一个值
+                    contentType = "image/jpeg";
+                    break;
+                case ".gif":
+                    contentType = "image/gif";
+                    break;
+                case ".svg":
+                    contentType = "image/svg+xml";
+                    break;
+                case ".ico":
+                    contentType = "image/x-icon";
+                    break;
+                case ".woff":
+                    contentType = "font/woff";
+                    break;
+                case ".woff2":
+                    contentType = "font/woff2";
+                    break;
+                default: // 对应 switch 表达式中的 _
+                    contentType = "application/octet-stream";
+                    break;
+            }
+
 
             response.ContentType = contentType;
             response.ContentEncoding = Encoding.UTF8;

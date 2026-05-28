@@ -72,15 +72,17 @@ namespace QCClient
         {
             if (_isSelecting)
             {
-                using var pen = new Pen(Color.Red, 2);
-                int x = Math.Min(_startPoint.X, _endPoint.X);
-                int y = Math.Min(_startPoint.Y, _endPoint.Y);
-                int w = Math.Abs(_endPoint.X - _startPoint.X);
-                int h = Math.Abs(_endPoint.Y - _startPoint.Y);
-                e.Graphics.DrawRectangle(pen, x, y, w, h);
+                using (var pen = new Pen(Color.Red, 2))
+                {
+                    int x = Math.Min(_startPoint.X, _endPoint.X);
+                    int y = Math.Min(_startPoint.Y, _endPoint.Y);
+                    int w = Math.Abs(_endPoint.X - _startPoint.X);
+                    int h = Math.Abs(_endPoint.Y - _startPoint.Y);
+                    e.Graphics.DrawRectangle(pen, x, y, w, h);
 
-                using var fill = new SolidBrush(Color.FromArgb(60, 255, 0, 0));
-                e.Graphics.FillRectangle(fill, x, y, w, h);
+                    var fill = new SolidBrush(Color.FromArgb(60, 255, 0, 0));
+                    e.Graphics.FillRectangle(fill, x, y, w, h);
+                }
             }
             base.OnPaint(e);
         }
