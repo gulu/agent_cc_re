@@ -60,6 +60,8 @@ QcRequest → Level 0: Pre-filter (CPU, ~10ms)
 
 **Conflict resolution:** Rules < BERT < Skill Squad < Hermes QA. LLM always has final say in synchronous mode.
 
+**QCClient project (`src/QCClient/`):** .NET Framework 4.8 WinForms application. All code must use C# 7.3 or below syntax. The following C# 8.0+ features are forbidden: using declarations, nullable reference types, switch expressions, range/indices operators (`^`, `..`), async streams (`IAsyncEnumerable<T>`), default interface methods. Only .NET Framework 4.8 built-in APIs allowed — no `Microsoft.Extensions.*`, no `System.Text.Json`, no Kestrel/ASP.NET Core. JSON serialization via `Newtonsoft.Json`, embedded HTTP via `System.Net.HttpListener`, UI via WinForms + WebView2.
+
 ## C# coding conventions
 
 - Namespace: `AgentQC.Module` (e.g., `AgentQC.Controllers`)

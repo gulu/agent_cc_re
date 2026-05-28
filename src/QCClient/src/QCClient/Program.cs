@@ -1,3 +1,6 @@
+// ⚠ 项目约束: 本项目的目标框架为 .NET Framework 4.8，所有代码必须使用 .NET Framework 4.8
+//    支持的 C# 7.3 及以下语法。禁止使用 C# 8.0+ 特性（如 using declarations, nullable reference types,
+//    switch expressions, range/indices, async streams），禁止使用 .NET Core/.NET 5+ 独有 API。
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
