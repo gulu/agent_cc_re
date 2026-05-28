@@ -149,8 +149,8 @@ namespace QCClient
         private Timer _pollTimer;
         private bool _polling;
         private int _pollIntervalMs = 5000;
-
-        private readonly List<SseClient> _sseClients = new();
+        // wzx 修改
+        private readonly List<SseClient> _sseClients = new List<SseClient>();
         private readonly object _sseLock = new();
 
         private string _lastAccessNumber = "";
