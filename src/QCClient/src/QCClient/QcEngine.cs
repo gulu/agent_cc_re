@@ -151,7 +151,7 @@ namespace QCClient
         private int _pollIntervalMs = 5000;
         // wzx 修改
         private readonly List<SseClient> _sseClients = new List<SseClient>();
-        private readonly object _sseLock = new();
+        private readonly object _sseLock =new object();
 
         private string _lastAccessNumber = "";
         private DateTime _lastQcTime = DateTime.MinValue;
@@ -283,9 +283,11 @@ namespace QCClient
                         form.Add(new StringContent(area.Name), "areaId");
                         form.Add(new StringContent(area.Type ?? ""), "areaType");
 
-                        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-                        var resp = await _http.PostAsync(
-                            $"{cfg.Backend.Url}/api/v1/ocr/recognize", form, cts.Token);
+                        using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10)))
+                        { 
+                      
+                            var resp = await _http.PostAsync(
+                                $"{cfg.Backend.Url}/api/v1/ocr/recognize", form, cts.Token);
                         if (resp.IsSuccessStatusCode)
                         {
                             var json = await resp.Content.ReadAsStringAsync();
@@ -294,6 +296,7 @@ namespace QCClient
                             {
                                 apiResp.Data.AreaId = area.Name;
                                 results.Add(apiResp.Data);
+                            }
                             }
                         }
                     }

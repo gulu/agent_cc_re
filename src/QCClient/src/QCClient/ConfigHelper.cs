@@ -8,16 +8,16 @@ namespace QCClient
     public class AppConfig
     {
         [JsonProperty("BackendSettings")]
-        public BackendSettings Backend { get; set; } = new();
+        public BackendSettings Backend { get; set; } = new BackendSettings();
 
         [JsonProperty("OcrSettings")]
-        public OcrSettings Ocr { get; set; } = new();
+        public OcrSettings Ocr { get; set; } = new OcrSettings();
 
         [JsonProperty("WebSettings")]
-        public WebSettings Web { get; set; } = new();
+        public WebSettings Web { get; set; } =new WebSettings();
 
         [JsonProperty("Logging")]
-        public LogSettings Logging { get; set; } = new();
+        public LogSettings Logging { get; set; } = new LogSettings();
     }
 
     public class BackendSettings
@@ -65,8 +65,8 @@ namespace QCClient
 
     public class LogSettings
     {
-        [JsonProperty("LogLevel")] public LogLevelConfig LogLevel { get; set; } = new();
-        [JsonProperty("File")] public LogFileConfig File { get; set; } = new();
+        [JsonProperty("LogLevel")] public LogLevelConfig LogLevel { get; set; } = new LogLevelConfig();
+        [JsonProperty("File")] public LogFileConfig File { get; set; } = new LogFileConfig();
     }
 
     public class LogLevelConfig
@@ -85,7 +85,7 @@ namespace QCClient
     {
         private readonly string _configPath;
         private AppConfig _config;
-        private readonly object _lock = new();
+        private readonly object _lock = new object();
         private DateTime _lastLoadTime;
         private FileSystemWatcher _watcher;
 
