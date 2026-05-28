@@ -127,7 +127,7 @@ var response = await httpClient.PostAsJsonAsync("http://localhost:8100/v1/chat/c
 | 组件 | 首选 | 备选 1 | 备选 2 |
 |------|------|--------|--------|
 | BERT 模型 | MedBERT-Chinese | PCL-MedBERT | bert-base-chinese + 放射科 DAPT |
-| LLM 模型 | Qwen2.5-7B GPTQ | Qwen2.5-3B AWQ | Qwen2.5-14B GPTQ-Int4 |
+| LLM 模型 | unsloth/Qwen3.5-9B | unsloth/Qwen3-0.6B-GGUF | unsloth/Qwen3-0.6B-GGUF |
 | LLM 部署 | vLLM | llama.cpp server | Ollama |
 | LLM 调用 | HTTP API | — | — |
 | BERT 部署 | ONNX GPU | ONNX CPU (降级) | — |

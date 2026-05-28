@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Agent_QC</RootNamespace>
+    <NuGetAudit>false</NuGetAudit>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,13 @@
     <PackageReference Include="FreeSql.Provider.Oracle" Version="3.5.309" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="YamlDotNet" Version="16.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="../../../knowledge/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>knowledge\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
 
 </Project>

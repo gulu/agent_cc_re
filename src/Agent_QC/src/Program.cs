@@ -26,20 +26,57 @@ if (dataType == DataType.Sqlite)
     connStr = $"Data Source={Path.Combine(dataDir, "qc.db")}";
 }
 
+// ── 主数据库 (SQLite) ──────────────────────────────
 var freeSql = new FreeSqlBuilder()
     .UseConnectionString(dataType, connStr)
     .UseNameConvert(NameConvertType.PascalCaseToUnderscore)
+    .UseAutoSyncStructure(true)
     .Build();
-
 builder.Services.AddSingleton(freeSql);
+
+// ── Oracle 连接 ────────────────────────────────────
+// ⚠ Oracle.ManagedDataAccess on Linux is sensitive to http_proxy/https_proxy env vars
+// Clear them before creating the Oracle connection to avoid ORA-50201
+var oracleFreeSql = default(IFreeSql);
+var oracleConnStr = dbConfig["OracleConnectionString"];
+if (!string.IsNullOrWhiteSpace(oracleConnStr))
+{
+    try
+    {
+        var savedHttpProxy = Environment.GetEnvironmentVariable("http_proxy");
+        var savedHttpsProxy = Environment.GetEnvironmentVariable("https_proxy");
+        Environment.SetEnvironmentVariable("http_proxy", "");
+        Environment.SetEnvironmentVariable("https_proxy", "");
+
+        oracleFreeSql = new FreeSqlBuilder()
+            .UseConnectionString(DataType.Oracle, oracleConnStr)
+            .UseNameConvert(NameConvertType.PascalCaseToUnderscoreWithUpper)
+            .UseAutoSyncStructure(false)
+            .Build();
+
+        Environment.SetEnvironmentVariable("http_proxy", savedHttpProxy);
+        Environment.SetEnvironmentVariable("https_proxy", savedHttpsProxy);
+
+        Console.WriteLine("[Oracle] FreeSql instance created");
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"[Oracle] 初始化失败: {ex.Message}");
+    }
+}
+if (oracleFreeSql != null)
+    builder.Services.AddSingleton(new ReportQueryService(oracleFreeSql));
+else
+    builder.Services.AddSingleton(new ReportQueryService(freeSql));
 
 // ── QC 服务 ─────────────────────────────────────────
 builder.Services.AddSingleton<IQcService, QcService>();
 
 // ── vLLM + Skill Squad ────────────────────────────
 var vllmEndpoint = builder.Configuration["Vllm:Endpoint"] ?? "http://localhost:8100";
-var vllmModel = builder.Configuration["Vllm:Model"] ?? "/home/gulu/.cache/modelscope/hub/models/Qwen/Qwen3-4B-AWQ";
-var vllmClient = new VllmClient(new HttpClient(), vllmEndpoint, vllmModel);
+var vllmModel = builder.Configuration["Vllm:Model"] ?? "QuantTrio/Qwen3.5-2B-AWQ";
+var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(300) };
+var vllmClient = new VllmClient(httpClient, vllmEndpoint, vllmModel);
 _ = vllmClient.CheckHealthAsync().ContinueWith(t =>
 {
     var status = t.GetAwaiter().GetResult() ? "healthy" : "unavailable";

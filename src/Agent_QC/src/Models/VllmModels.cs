@@ -31,13 +31,38 @@ public class VllmChatResponse
         {
             var content = Choices.FirstOrDefault()?.Message?.Content;
             if (content == null) return null;
-            // 后备：剥离 Qwen3 思考标签（JSON 约束解码下不应出现）
+            // 剥离 Qwen3 思考标签
             const string closeTag = "</think>";
             int idx = content.IndexOf(closeTag, StringComparison.Ordinal);
             if (idx >= 0)
                 content = content[(idx + closeTag.Length)..].TrimStart();
+            // 剥离 markdown 代码块包装 (```json ... ```)
+            content = StripMarkdownCodeBlock(content);
             return content;
         }
+    }
+
+    private static string StripMarkdownCodeBlock(string text)
+    {
+        text = text.Trim();
+        const string prefix = "```json";
+        const string suffix = "```";
+        if (text.StartsWith(prefix, StringComparison.Ordinal))
+        {
+            text = text[prefix.Length..];
+            int end = text.LastIndexOf(suffix, StringComparison.Ordinal);
+            if (end >= 0)
+                text = text[..end];
+        }
+        else if (text.StartsWith("```", StringComparison.Ordinal))
+        {
+            // Generic code block without language tag
+            text = text[3..];
+            int end = text.LastIndexOf(suffix, StringComparison.Ordinal);
+            if (end >= 0)
+                text = text[..end];
+        }
+        return text.Trim();
     }
 }
 

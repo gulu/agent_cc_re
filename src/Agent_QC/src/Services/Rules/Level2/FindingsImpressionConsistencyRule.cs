@@ -28,19 +28,23 @@ public class FindingsImpressionConsistencyRule
         var impressionFirst = impression.Length > 200 ? impression[..200] : impression;
 
         var findingsAllNegative = FullNegationPhrases.Any(p => findingsLast.Contains(p, StringComparison.Ordinal));
-        var positiveWords = new[] { "结节", "肿块", "占位", "病变", "骨折", "出血", "炎症", "感染", "异常" };
-        var impressionHasPositive = positiveWords.Any(w => impressionFirst.Contains(w, StringComparison.Ordinal));
+        var impressionAllNegative = FullNegationPhrases.Any(p => impressionFirst.Contains(p, StringComparison.Ordinal));
 
-        if (findingsAllNegative && impressionHasPositive)
+        // 仅当所见阴性 + 结论非阴性时报警（避免"未见异常→未见异常"误报）
+        if (findingsAllNegative && !impressionAllNegative)
         {
-            issues.Add(new QcIssueDto
+            var positiveWords = new[] { "结节", "肿块", "占位", "病变", "骨折", "出血", "炎症", "感染", "异常" };
+            if (positiveWords.Any(w => impressionFirst.Contains(w, StringComparison.Ordinal)))
             {
-                IssueType = "semantic_conflict",
-                SubType = "diagnosis_jump",
-                Severity = "error",
-                Description = "所见描述均为阴性（正常），但结论给出阳性诊断",
-                Suggestion = "请检查所见描述是否遗漏了阳性发现",
-            });
+                issues.Add(new QcIssueDto
+                {
+                    IssueType = "semantic_conflict",
+                    SubType = "diagnosis_jump",
+                    Severity = "error",
+                    Description = "所见描述均为阴性（正常），但结论给出阳性诊断",
+                    Suggestion = "请检查所见描述是否遗漏了阳性发现",
+                });
+            }
         }
 
         // 程度矛盾：所见轻度 + 结论重度

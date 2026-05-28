@@ -23,11 +23,8 @@ namespace QCClient
 
     public class BackendSettings
     {
-        [JsonProperty("QCServiceUrl")]
-        public string QCServiceUrl { get; set; } = "http://localhost:5200";
-
-        [JsonProperty("ReportQCUrl")]
-        public string ReportQCUrl { get; set; } = "http://localhost:5100";
+        [JsonProperty("Url")]
+        public string Url { get; set; } = "http://localhost:5263";
 
         [JsonProperty("ApiTimeoutSeconds")]
         public int ApiTimeoutSeconds { get; set; } = 30;
