@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>报告质控助手</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="light">
+
+<div id="app">
+  <!-- 顶栏 -->
+  <header class="header">
+    <span class="status-dot" id="statusDot" title="连接状态">●</span>
+    <span class="header-title">报告质控助手</span>
+    <button class="collapse-btn" id="collapseBtn" title="收起面板 (Ctrl+Q)">−</button>
+  </header>
+
+  <!-- 输入区 -->
+  <section class="input-area">
+    <div class="input-row">
+      <input type="text" id="accessNumber" placeholder="输入影像号，回车质控" maxlength="32">
+      <button id="btnQc" onclick="triggerQc()">质控</button>
+    </div>
+    <div class="manual-tip" onclick="toggleManual()">
+      <span id="manualToggle">+ 手动输入报告内容</span>
+    </div>
+    <div class="manual-row" id="manualRow">
+      <textarea id="manualFindings" placeholder="影像所见" rows="3"></textarea>
+      <textarea id="manualImpression" placeholder="诊断结论" rows="2"></textarea>
+      <button class="btn-manual" onclick="manualQc()">手动质控</button>
+    </div>
+  </section>
+
+  <!-- 状态提示 -->
+  <div class="status-tip" id="statusTip">等待质控触发...</div>
+
+  <!-- 内容区 -->
+  <main class="content" id="content">
+    <!-- 空状态 -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🔬</div>
+      <p>等待质控结果</p>
+      <p class="empty-hint">系统将在检测到影像号后自动分析<br>也可在上方手动输入触发</p>
+    </div>
+
+    <!-- 加载 -->
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p id="loadingText">分析中...</p>
+    </div>
+
+    <!-- 评分区 -->
+    <div class="score-block" id="scoreBlock">
+      <div class="score-ring" id="scoreRing">
+        <span class="score-num" id="scoreNum">--</span>
+      </div>
+      <div class="score-info">
+        <div class="score-verdict" id="scoreVerdict"></div>
+        <div class="score-detail" id="scoreDetail"></div>
+      </div>
+    </div>
+
+    <!-- 维度条 -->
+    <div class="dims-block" id="dimsBlock">
+      <div class="dim-list" id="dimList"></div>
+    </div>
+
+    <!-- 问题列表 — 按严重程度分组 -->
+    <div class="issues-block" id="issuesBlock">
+      <div class="issues-header">质控问题 <span class="issues-total" id="issuesTotal"></span></div>
+      <div id="issueGroups"></div>
+    </div>
+
+    <!-- 摘要 -->
+    <div class="summary-block" id="summaryBlock">
+      <p id="summaryText"></p>
+    </div>
+  </main>
+
+  <!-- 底部操作 -->
+  <footer class="footer">
+    <button class="footer-btn primary" onclick="copyForClinical()">📋 复制修改建议</button>
+    <button class="footer-btn" onclick="reQc()">🔄 重新质控</button>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
