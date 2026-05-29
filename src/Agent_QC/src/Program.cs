@@ -111,11 +111,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+
+if (app.Configuration.GetValue<bool>("EnableSwagger"))
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    // 👇 自动根路径 / 跳转到 swagger
+    app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
 }
+
 
 app.UseCors("AllowAll");
 app.UseAuthorization();

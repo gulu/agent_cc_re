@@ -24,4 +24,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Remove="..\..\..\knowledge\skills\gender-anatomy-checker.md" />
+    <Content Remove="..\..\..\knowledge\skills\site-consistency-checker.md" />
+    <Content Remove="..\..\..\knowledge\skills\terminology-validator.md" />
+  </ItemGroup>
+
 </Project>
