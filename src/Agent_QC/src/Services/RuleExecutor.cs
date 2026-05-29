@@ -314,8 +314,20 @@ public partial class RuleExecutor
         {
             using var doc = JsonDocument.Parse(rule.ParamsJson);
             if (doc.RootElement.TryGetProperty("valid_duplicates", out var vd))
-                foreach (var c in vd.EnumerateArray())
-                    if (c.GetString() is { Length: > 0 } s) validDuplicates.Add(s[0]);
+            {
+                if (vd.ValueKind == JsonValueKind.String)
+                {
+                    var str = vd.GetString();
+                    if (str != null)
+                        foreach (var c in str)
+                            validDuplicates.Add(c);
+                }
+                else if (vd.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var c in vd.EnumerateArray())
+                        if (c.GetString() is { Length: > 0 } s) validDuplicates.Add(s[0]);
+                }
+            }
         }
 
         foreach (Match m in DupPattern().Matches(fullText))

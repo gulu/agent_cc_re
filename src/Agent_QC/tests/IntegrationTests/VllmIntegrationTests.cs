@@ -24,7 +24,12 @@ public class VllmIntegrationTests
         var vllm = new VllmClient(new HttpClient(), "http://localhost:8100", "qwen3-4b-awq");
         await vllm.CheckHealthAsync();
         var registry = new SkillRegistry("knowledge/skills");
-        var service = new QcService(vllm, registry);
+        var dbPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "rules.db");
+        if (!File.Exists(dbPath))
+            dbPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "..", "knowledge", "rules.db"));
+        var ruleEngine = new RuleEngine(dbPath);
+        ruleEngine.Initialize();
+        var service = new QcService(ruleEngine, vllm, registry);
 
         var request = new QcRequest
         {
