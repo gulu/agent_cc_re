@@ -79,6 +79,23 @@ var ruleEngine = new RuleEngine(rulesDbPath);
 ruleEngine.Initialize();
 builder.Services.AddSingleton(ruleEngine);
 
+// ── Level 2: RoBERTa NER + Logic Engine ─────────────
+var terminologyPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "terminology.yaml");
+var entityNormalizer = new EntityNormalizer(terminologyPath);
+builder.Services.AddSingleton(entityNormalizer);
+
+builder.Services.AddSingleton<LogicEngine>();
+
+var modelPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "models", "roberta-ner.onnx");
+builder.Services.AddSingleton(sp =>
+{
+    var jieba = sp.GetRequiredService<JiebaSegmenter>();
+    var normalizer = sp.GetRequiredService<EntityNormalizer>();
+    var service = new RobertaNerService(jieba, normalizer, modelPath);
+    service.Initialize();
+    return service;
+});
+
 // ── QC 服务 ─────────────────────────────────────────
 builder.Services.AddSingleton<IQcService, QcService>();
 

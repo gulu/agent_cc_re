@@ -29,7 +29,14 @@ public class VllmIntegrationTests
             dbPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "..", "knowledge", "rules.db"));
         var ruleEngine = new RuleEngine(dbPath);
         ruleEngine.Initialize();
-        var service = new QcService(ruleEngine, vllm, registry);
+        var dictPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "jieba_medical_dict.txt");
+        var terminologyPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "terminology.yaml");
+        var jieba = new JiebaSegmenter(dictPath);
+        var normalizer = new EntityNormalizer(terminologyPath);
+        var modelPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "models", "roberta-ner.onnx");
+        var robertaNer = new RobertaNerService(jieba, normalizer, modelPath);
+        var logicEngine = new LogicEngine();
+        var service = new QcService(ruleEngine, robertaNer, normalizer, logicEngine, vllm, registry);
 
         var request = new QcRequest
         {

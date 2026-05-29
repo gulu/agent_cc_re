@@ -6,7 +6,7 @@ namespace Agent_QC.Tests.UnitTests.Services;
 
 public class QcServiceTests
 {
-    private RuleEngine CreateEngine()
+    private static RuleEngine CreateEngine()
     {
         var dbPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "rules.db");
         if (!File.Exists(dbPath))
@@ -20,11 +20,36 @@ public class QcServiceTests
         return engine;
     }
 
+    private static (RobertaNerService robertaNer, EntityNormalizer normalizer, LogicEngine logicEngine) CreateLevel2()
+    {
+        var baseDir = AppContext.BaseDirectory;
+        var dictPath = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "..", "..", "knowledge", "jieba_medical_dict.txt"));
+        if (!File.Exists(dictPath))
+            dictPath = Path.Combine(baseDir, "knowledge", "jieba_medical_dict.txt");
+
+        var terminologyPath = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "..", "..", "knowledge", "terminology.yaml"));
+        if (!File.Exists(terminologyPath))
+            terminologyPath = Path.Combine(baseDir, "knowledge", "terminology.yaml");
+
+        var jieba = new JiebaSegmenter(dictPath);
+        var normalizer = new EntityNormalizer(terminologyPath);
+        var modelPath = Path.Combine(baseDir, "knowledge", "models", "roberta-ner.onnx");
+        var robertaNer = new RobertaNerService(jieba, normalizer, modelPath);
+        var logicEngine = new LogicEngine();
+        return (robertaNer, normalizer, logicEngine);
+    }
+
+    private QcService CreateService()
+    {
+        var (robertaNer, normalizer, logicEngine) = CreateLevel2();
+        return new QcService(CreateEngine(), robertaNer, normalizer, logicEngine);
+    }
+
     [Fact]
     public async Task 正常报告_无问题_满分通过()
     {
         var engine = CreateEngine();
-        var service = new QcService(engine);
+        var service = CreateService();
         var request = new QcRequest
         {
             ReportId = "R001",
@@ -52,7 +77,7 @@ public class QcServiceTests
     public async Task 男女矛盾_降分并报critical()
     {
         var engine = CreateEngine();
-        var service = new QcService(engine);
+        var service = CreateService();
         var request = new QcRequest
         {
             ReportId = "R002",
@@ -75,7 +100,7 @@ public class QcServiceTests
     public async Task 危急征象_报critical级别()
     {
         var engine = CreateEngine();
-        var service = new QcService(engine);
+        var service = CreateService();
         var request = new QcRequest
         {
             ReportId = "R003",
@@ -94,7 +119,7 @@ public class QcServiceTests
     public async Task ReportId为空_返回错误()
     {
         var engine = CreateEngine();
-        var service = new QcService(engine);
+        var service = CreateService();
         var request = new QcRequest
         {
             ReportId = "",
@@ -111,7 +136,7 @@ public class QcServiceTests
     public async Task 多项问题_合并返回()
     {
         var engine = CreateEngine();
-        var service = new QcService(engine);
+        var service = CreateService();
         var request = new QcRequest
         {
             ReportId = "R005",
@@ -133,7 +158,7 @@ public class QcServiceTests
     public async Task 平扫出现增强描述_报错()
     {
         var engine = CreateEngine();
-        var service = new QcService(engine);
+        var service = CreateService();
         var request = new QcRequest
         {
             ReportId = "R006",

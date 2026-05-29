@@ -13,6 +13,11 @@ public class QcService : IQcService
     // Rule engine (replaces ALL Level 1-4 individual rule classes)
     private readonly RuleEngine _ruleEngine;
 
+    // Level 2: RoBERTa NER + Logic Engine
+    private readonly RobertaNerService _robertaNer;
+    private readonly EntityNormalizer _entityNormalizer;
+    private readonly LogicEngine _logicEngine;
+
     // Measurement unit (preserved — not migrated)
     private readonly UnitFormatRule _unitFormatRule = new();
 
@@ -24,10 +29,17 @@ public class QcService : IQcService
 
     private readonly ScoringEngine _scoringEngine = new();
 
-    public QcService(RuleEngine ruleEngine, IVllmClient? vllm = null,
+    public QcService(RuleEngine ruleEngine,
+        RobertaNerService robertaNer,
+        EntityNormalizer entityNormalizer,
+        LogicEngine logicEngine,
+        IVllmClient? vllm = null,
         SkillRegistry? skillRegistry = null, JiebaSegmenter? jieba = null)
     {
         _ruleEngine = ruleEngine;
+        _robertaNer = robertaNer;
+        _entityNormalizer = entityNormalizer;
+        _logicEngine = logicEngine;
         _vllm = vllm ?? new VllmClient(new HttpClient(), "http://localhost:8100");
         _skillRegistry = skillRegistry ?? new SkillRegistry();
         _jieba = jieba ?? new JiebaSegmenter("knowledge/jieba_medical_dict.txt");
@@ -47,8 +59,15 @@ public class QcService : IQcService
         request.SegmentedFindings = _jieba.Segment(request.Findings ?? "");
         request.SegmentedImpression = _jieba.Segment(request.Impression ?? "");
 
-        // Level 1-4: unified rule engine
+        // Level 1: unified rule engine
         issues.AddRange(_ruleEngine.Execute(request));
+
+        // Level 2: RoBERTa NER + Logic Engine
+        var findingsEntities = _robertaNer.Extract(request.Findings ?? "");
+        var impressionEntities = _robertaNer.Extract(request.Impression ?? "");
+        var nFindings = _entityNormalizer.Normalize(findingsEntities);
+        var nImpression = _entityNormalizer.Normalize(impressionEntities);
+        issues.AddRange(_logicEngine.Compare(request, nFindings, nImpression, issues));
 
         // Measurement unit check (preserved separately)
         issues.AddRange(_unitFormatRule.Check(request));
