@@ -73,6 +73,12 @@ else
 var dictPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "jieba_medical_dict.txt");
 builder.Services.AddSingleton(new JiebaSegmenter(dictPath));
 
+// ── RuleEngine (replaces individual rule classes) ──
+var rulesDbPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "rules.db");
+var ruleEngine = new RuleEngine(rulesDbPath);
+ruleEngine.Initialize();
+builder.Services.AddSingleton(ruleEngine);
+
 // ── QC 服务 ─────────────────────────────────────────
 builder.Services.AddSingleton<IQcService, QcService>();
 
