@@ -34,7 +34,8 @@ public class VllmIntegrationTests
         var jieba = new JiebaSegmenter(dictPath);
         var normalizer = new EntityNormalizer(terminologyPath);
         var modelPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "models", "roberta-ner.onnx");
-        var robertaNer = new RobertaNerService(jieba, normalizer, modelPath);
+        var vocabPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "models", "vocab.txt");
+        var robertaNer = new RobertaNerService(jieba, normalizer, modelPath, vocabPath);
         var logicEngine = new LogicEngine();
         var service = new QcService(ruleEngine, robertaNer, normalizer, logicEngine, vllm, registry);
 

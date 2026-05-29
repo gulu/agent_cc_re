@@ -87,11 +87,12 @@ builder.Services.AddSingleton(entityNormalizer);
 builder.Services.AddSingleton<LogicEngine>();
 
 var modelPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "models", "roberta-ner.onnx");
+var vocabPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "models", "vocab.txt");
 builder.Services.AddSingleton(sp =>
 {
     var jieba = sp.GetRequiredService<JiebaSegmenter>();
     var normalizer = sp.GetRequiredService<EntityNormalizer>();
-    var service = new RobertaNerService(jieba, normalizer, modelPath);
+    var service = new RobertaNerService(jieba, normalizer, modelPath, vocabPath);
     service.Initialize();
     return service;
 });

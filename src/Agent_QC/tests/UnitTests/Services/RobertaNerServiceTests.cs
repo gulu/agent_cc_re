@@ -20,7 +20,8 @@ public class RobertaNerServiceTests
         var jieba = new JiebaSegmenter(dictPath);
         var normalizer = new EntityNormalizer(terminologyPath);
         var modelPath = Path.Combine(baseDir, "knowledge", "models", "roberta-ner.onnx");
-        var service = new RobertaNerService(jieba, normalizer, modelPath);
+        var vocabPath = Path.Combine(baseDir, "knowledge", "models", "vocab.txt");
+        var service = new RobertaNerService(jieba, normalizer, modelPath, vocabPath);
         // Don't call Initialize() — we want dictionary fallback for tests
         return service;
     }

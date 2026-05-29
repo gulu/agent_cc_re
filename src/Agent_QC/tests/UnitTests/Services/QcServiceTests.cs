@@ -34,7 +34,8 @@ public class QcServiceTests
         var jieba = new JiebaSegmenter(dictPath);
         var normalizer = new EntityNormalizer(terminologyPath);
         var modelPath = Path.Combine(baseDir, "knowledge", "models", "roberta-ner.onnx");
-        var robertaNer = new RobertaNerService(jieba, normalizer, modelPath);
+        var vocabPath = Path.Combine(baseDir, "knowledge", "models", "vocab.txt");
+        var robertaNer = new RobertaNerService(jieba, normalizer, modelPath, vocabPath);
         var logicEngine = new LogicEngine();
         return (robertaNer, normalizer, logicEngine);
     }
