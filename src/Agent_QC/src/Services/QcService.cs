@@ -12,8 +12,9 @@ namespace Agent_QC.Services;
 /// </summary>
 public class QcService : IQcService
 {
-    // Level 0
+    // Level 0: 预处理
     private readonly SectionParser _sectionParser = new();
+    private readonly JiebaSegmenter _jieba;
 
     // Level 1: 文本格式
     private readonly PhraseTypoRule _phraseTypoRule = new();
@@ -51,10 +52,11 @@ public class QcService : IQcService
     // 评分
     private readonly ScoringEngine _scoringEngine = new();
 
-    public QcService(IVllmClient? vllm = null, SkillRegistry? skillRegistry = null)
+    public QcService(IVllmClient? vllm = null, SkillRegistry? skillRegistry = null, JiebaSegmenter? jieba = null)
     {
         _vllm = vllm ?? new VllmClient(new HttpClient(), "http://localhost:8100");
         _skillRegistry = skillRegistry ?? new SkillRegistry();
+        _jieba = jieba ?? new JiebaSegmenter("knowledge/jieba_medical_dict.txt");
         _orchestrator = new HermesOrchestrator(_vllm, _skillRegistry);
         _arbiter = new QaArbiter();
     }
@@ -66,6 +68,10 @@ public class QcService : IQcService
 
         var sw = Stopwatch.StartNew();
         var issues = new List<QcIssueDto>();
+
+        // ── Level 0: 预处理（中文分词） ──
+        request.SegmentedFindings = _jieba.Segment(request.Findings ?? "");
+        request.SegmentedImpression = _jieba.Segment(request.Impression ?? "");
 
         // ── Level 1: 文本格式 ──
         issues.AddRange(_phraseTypoRule.Check(request));

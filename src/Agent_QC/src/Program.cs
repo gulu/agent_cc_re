@@ -69,6 +69,10 @@ if (oracleFreeSql != null)
 else
     builder.Services.AddSingleton(new ReportQueryService(freeSql));
 
+// ── jieba 中文分词 ──────────────────────────────────
+var dictPath = Path.Combine(AppContext.BaseDirectory, "knowledge", "jieba_medical_dict.txt");
+builder.Services.AddSingleton(new JiebaSegmenter(dictPath));
+
 // ── QC 服务 ─────────────────────────────────────────
 builder.Services.AddSingleton<IQcService, QcService>();
 
